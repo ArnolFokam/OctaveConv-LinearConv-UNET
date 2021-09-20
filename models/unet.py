@@ -1,7 +1,8 @@
 from collections import OrderedDict
 
-import torch.nn as nn
 import torch
+from torch import nn
+
 
 class UNet(nn.Module):
 
