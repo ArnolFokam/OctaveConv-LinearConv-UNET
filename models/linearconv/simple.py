@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-class XCNN(torch.nn.Module):
+class xCNN(torch.nn.Module):
     def __init__(self,
                  channels,
                  filters,
@@ -13,7 +13,7 @@ class XCNN(torch.nn.Module):
                  groups=1,
                  device=torch.device('cpu'),
                  bias=True):
-        super(XCNN, self).__init__()
+        super(xCNN, self).__init__()
         self.filters = filters
         self.times = 2  # ratio 1/2
         self.kernel_size = kernel_size
