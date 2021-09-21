@@ -23,12 +23,12 @@ class EncoderBlock(nn.Module):
         super(EncoderBlock, self).__init__()
 
         if downsample == 'max':
-            self.downsample = nn.MaxPool2d(kernel_size=self.kernel_size,
-                                           stride=self.stride)
+            self.downsample = nn.MaxPool2d(kernel_size=kernel_size,
+                                           stride=stride)
 
         elif downsample == 'avg':
-            self.downsample = nn.AvgPool2d(kernel_size=self.kernel_size,
-                                           stride=self.stride)
+            self.downsample = nn.AvgPool2d(kernel_size=kernel_size,
+                                           stride=stride)
 
         elif downsample == 'conv':
             self.downsample = ConvBlock(in_channels,
