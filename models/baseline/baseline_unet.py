@@ -113,22 +113,22 @@ class BaselineUNet(UNetBackBone):
         for name, module in self.named_children():
             if name == 'encoder_0':
                 locals()[name] = module(inputs)
+
             elif name == 'decoder_0':
                 outputs = module(locals()[name[:-1]])
 
             elif name == 'decoder_{}'.format(len(self.channels) - 2):
-                (locals()[name]) = module(
+                locals()[name] = module(
                     locals()['en' + name[2:]],
                     locals()['en' + name[2:-1] +
                              str(int(name[-1]) - 1)])
 
             elif 'encoder_' in name:
-                (locals()[name]) = module(
-                    locals()[name[:-1] + str(int(name[-1]) - 1)]
-                )
+                locals()[name] = module(
+                    locals()[name[:-1] + str(int(name[-1]) - 1)])
 
             elif 'decoder_' in name:
-                (locals()[name]) = module(
+                locals()[name + '_h'] = module(
                     locals()[name[:-1] + str(int(name[-1]) + 1)],
                     locals()['en' + name[2:-1] +
                              str(int(name[-1]) - 1)])
