@@ -135,8 +135,7 @@ class OctaveUNet(UNetBackBone):
                                          groups=self.groups,
                                          bias=self.bias,
                                          padding_mode=self.padding_mode))
-            i -= 1
-
+        i -= 1
         self.add_module('decoder_0',
                         FinalBlock(in_channels=self.channels[1],
                                    out_channels=self.channels[-1],
