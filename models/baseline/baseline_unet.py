@@ -119,10 +119,7 @@ class BaselineUNet(UNetBackBone):
                 (locals()[name]) = module(
                     locals()['en' + name[2:]],
                     locals()['en' + name[2:-1] +
-                             str(int(name[-1]) - 1)],
-                    locals()['en' + name[2:]],
-                    locals()['en' + name[2:-1] + str(
-                        int(name[-1]) - 1) + '_l'])
+                             str(int(name[-1]) - 1)])
 
             elif 'encoder_' in name:
                 (locals()[name]) = module(
