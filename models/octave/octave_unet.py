@@ -1,4 +1,3 @@
-
 """
 Octave UNet models
 """
@@ -7,32 +6,50 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from torch import nn
-
 from models.octave.blocks.initial_block import InitialBlock
 from models.octave.blocks.encoder_block import EncoderBlock
 from models.octave.blocks.decoder_block import DecoderBlock
 from models.octave.blocks.final_block import FinalBlock
+from models.unet import UNetBackBone
 
 
-class OctaveUNet(nn.Module):
+class OctaveUNet(UNetBackBone):
     """Octave UNet with fixed number of layers."""
 
-    def __init__(self, channels=None, alphas=None, kernel_size=3, stride=2,
-                 padding=1, dilation=1, groups=1,
-                 bias=True, batch_norm=True, dropout=False,
-                 padding_mode='zeros', merge_mode='padding'):
-        super(OctaveUNet, self).__init__()
+    def __init__(self,
+                 channels=None,
+                 alphas=None,
+                 kernel_size=3,
+                 stride=2,
+                 padding=1,
+                 dilation=1,
+                 groups=1,
+                 bias=True,
+                 batch_norm=True,
+                 dropout=False,
+                 padding_mode='zeros',
+                 merge_mode='padding'):
+        super(OctaveUNet, self).__init__(
+            channels,
+            kernel_size,
+            stride,
+            padding,
+            dilation,
+            groups,
+            bias,
+            batch_norm,
+            dropout,
+            padding_mode,
+            merge_mode)
 
         if alphas is None:
             alphas = [0.5] * 6
 
-        if channels is None:
-            channels = [3, 32, 64, 128, 256, 512]
-        assert len(channels) == 6
+        if self.channels is None:
+            self.channels = [3, 32, 64, 128, 256, 512]
+        assert len(self.channels) == 6
         assert len(alphas) == 6
 
-        self.channels = channels
         self.alphas = alphas
 
         self.encoder_0 = InitialBlock(in_channels=channels[0],
@@ -41,18 +58,18 @@ class OctaveUNet(nn.Module):
                                       in_alpha=alphas[0],
                                       mid_alpha=alphas[1],
                                       out_alpha=alphas[1],
-                                      batch_norm=batch_norm,
-                                      dropout=dropout,
+                                      batch_norm=self.batch_norm,
+                                      dropout=self.self.dropout,
                                       act_fn='relu',
                                       spatial_ratio=2,
-                                      merge_mode=merge_mode,
-                                      kernel_size=kernel_size,
-                                      stride=stride,
-                                      padding=padding,
-                                      dilation=dilation,
-                                      groups=groups,
-                                      bias=bias,
-                                      padding_mode=padding_mode)
+                                      merge_mode=self.merge_mode,
+                                      kernel_size=self.kernel_size,
+                                      stride=self.stride,
+                                      padding=self.padding,
+                                      dilation=self.dilation,
+                                      groups=self.groups,
+                                      bias=self.bias,
+                                      padding_mode=self.padding_mode)
 
         self.encoder_1 = EncoderBlock(in_channels=channels[1],
                                       mid_channels=channels[2],
@@ -62,18 +79,18 @@ class OctaveUNet(nn.Module):
                                       out_alpha=alphas[2],
                                       downsample='avg',
                                       scale_factor=2,
-                                      batch_norm=batch_norm,
-                                      dropout=dropout,
+                                      batch_norm=self.batch_norm,
+                                      dropout=self.dropout,
                                       act_fn='relu',
                                       spatial_ratio=2,
-                                      merge_mode=merge_mode,
-                                      kernel_size=kernel_size,
-                                      stride=stride,
-                                      padding=padding,
-                                      dilation=dilation,
-                                      groups=groups,
-                                      bias=bias,
-                                      padding_mode=padding_mode)
+                                      merge_mode=self.merge_mode,
+                                      kernel_size=self.kernel_size,
+                                      stride=self.stride,
+                                      padding=self.padding,
+                                      dilation=self.dilation,
+                                      groups=self.groups,
+                                      bias=self.bias,
+                                      padding_mode=self.padding_mode)
 
         self.encoder_2 = EncoderBlock(in_channels=channels[2],
                                       mid_channels=channels[3],
@@ -83,18 +100,18 @@ class OctaveUNet(nn.Module):
                                       out_alpha=alphas[3],
                                       downsample='avg',
                                       scale_factor=2,
-                                      batch_norm=batch_norm,
-                                      dropout=dropout,
+                                      batch_norm=self.batch_norm,
+                                      dropout=self.dropout,
                                       act_fn='relu',
                                       spatial_ratio=2,
-                                      merge_mode=merge_mode,
-                                      kernel_size=kernel_size,
-                                      stride=stride,
-                                      padding=padding,
-                                      dilation=dilation,
-                                      groups=groups,
-                                      bias=bias,
-                                      padding_mode=padding_mode)
+                                      merge_mode=self.merge_mode,
+                                      kernel_size=self.kernel_size,
+                                      stride=self.stride,
+                                      padding=self.padding,
+                                      dilation=self.dilation,
+                                      groups=self.groups,
+                                      bias=self.bias,
+                                      padding_mode=self.padding_mode)
 
         self.encoder_3 = EncoderBlock(in_channels=channels[3],
                                       mid_channels=channels[4],
@@ -104,18 +121,18 @@ class OctaveUNet(nn.Module):
                                       out_alpha=alphas[4],
                                       downsample='avg',
                                       scale_factor=2,
-                                      batch_norm=batch_norm,
-                                      dropout=dropout,
+                                      batch_norm=self.batch_norm,
+                                      dropout=self.dropout,
                                       act_fn='relu',
                                       spatial_ratio=2,
-                                      merge_mode=merge_mode,
-                                      kernel_size=kernel_size,
-                                      stride=stride,
-                                      padding=padding,
-                                      dilation=dilation,
-                                      groups=groups,
-                                      bias=bias,
-                                      padding_mode=padding_mode)
+                                      merge_mode=self.merge_mode,
+                                      kernel_size=self.kernel_size,
+                                      stride=self.stride,
+                                      padding=self.padding,
+                                      dilation=self.dilation,
+                                      groups=self.groups,
+                                      bias=self.bias,
+                                      padding_mode=self.padding_mode)
 
         self.encoder_4 = EncoderBlock(in_channels=channels[4],
                                       mid_channels=channels[4],
@@ -125,18 +142,18 @@ class OctaveUNet(nn.Module):
                                       out_alpha=alphas[4],
                                       downsample='avg',
                                       scale_factor=2,
-                                      batch_norm=batch_norm,
-                                      dropout=dropout,
+                                      batch_norm=self.batch_norm,
+                                      dropout=self.dropout,
                                       act_fn='relu',
                                       spatial_ratio=2,
-                                      merge_mode=merge_mode,
-                                      kernel_size=kernel_size,
-                                      stride=stride,
-                                      padding=padding,
-                                      dilation=dilation,
-                                      groups=groups,
-                                      bias=bias,
-                                      padding_mode=padding_mode)
+                                      merge_mode=self.merge_mode,
+                                      kernel_size=self.kernel_size,
+                                      stride=self.stride,
+                                      padding=self.padding,
+                                      dilation=self.dilation,
+                                      groups=self.groups,
+                                      bias=self.bias,
+                                      padding_mode=self.padding_mode)
 
         self.decoder_4 = DecoderBlock(in_channels=channels[4],
                                       mid_channels=channels[3],
@@ -146,19 +163,18 @@ class OctaveUNet(nn.Module):
                                       out_alpha=alphas[3],
                                       upsample='transp',
                                       scale_factor=2,
-                                      batch_norm=batch_norm,
-                                      dropout=dropout,
+                                      batch_norm=self.batch_norm,
+                                      dropout=self.dropout,
                                       act_fn='relu',
                                       spatial_ratio=2,
-                                      merge_mode=merge_mode,
-                                      kernel_size=kernel_size,
-                                      stride=stride,
-                                      padding=padding,
-                                      output_padding=padding,
-                                      dilation=dilation,
-                                      groups=groups,
-                                      bias=bias,
-                                      padding_mode=padding_mode)
+                                      merge_mode=self.merge_mode,
+                                      kernel_size=self.kernel_size,
+                                      stride=self.stride,
+                                      padding=self.padding,
+                                      dilation=self.dilation,
+                                      groups=self.groups,
+                                      bias=self.bias,
+                                      padding_mode=self.padding_mode)
 
         self.decoder_3 = DecoderBlock(in_channels=channels[3],
                                       mid_channels=channels[2],
@@ -168,19 +184,18 @@ class OctaveUNet(nn.Module):
                                       out_alpha=alphas[2],
                                       upsample='transp',
                                       scale_factor=2,
-                                      batch_norm=batch_norm,
-                                      dropout=dropout,
+                                      batch_norm=self.batch_norm,
+                                      dropout=self.dropout,
                                       act_fn='relu',
                                       spatial_ratio=2,
-                                      merge_mode=merge_mode,
-                                      kernel_size=kernel_size,
-                                      stride=stride,
-                                      padding=padding,
-                                      output_padding=padding,
-                                      dilation=dilation,
-                                      groups=groups,
-                                      bias=bias,
-                                      padding_mode=padding_mode)
+                                      merge_mode=self.merge_mode,
+                                      kernel_size=self.kernel_size,
+                                      stride=self.stride,
+                                      padding=self.padding,
+                                      dilation=self.dilation,
+                                      groups=self.groups,
+                                      bias=self.bias,
+                                      padding_mode=self.padding_mode)
 
         self.decoder_2 = DecoderBlock(in_channels=channels[2],
                                       mid_channels=channels[1],
@@ -190,19 +205,18 @@ class OctaveUNet(nn.Module):
                                       out_alpha=alphas[1],
                                       upsample='transp',
                                       scale_factor=2,
-                                      batch_norm=batch_norm,
-                                      dropout=dropout,
+                                      batch_norm=self.batch_norm,
+                                      dropout=self.dropout,
                                       act_fn='relu',
                                       spatial_ratio=2,
-                                      merge_mode=merge_mode,
-                                      kernel_size=kernel_size,
-                                      stride=stride,
-                                      padding=padding,
-                                      output_padding=padding,
-                                      dilation=dilation,
-                                      groups=groups,
-                                      bias=bias,
-                                      padding_mode=padding_mode)
+                                      merge_mode=self.merge_mode,
+                                      kernel_size=self.kernel_size,
+                                      stride=self.stride,
+                                      padding=self.padding,
+                                      dilation=self.dilation,
+                                      groups=self.groups,
+                                      bias=self.bias,
+                                      padding_mode=self.padding_mode)
 
         self.decoder_1 = DecoderBlock(in_channels=channels[1],
                                       mid_channels=channels[1],
@@ -212,36 +226,35 @@ class OctaveUNet(nn.Module):
                                       out_alpha=alphas[1],
                                       upsample='transp',
                                       scale_factor=2,
-                                      batch_norm=batch_norm,
-                                      dropout=dropout,
+                                      batch_norm=self.batch_norm,
+                                      dropout=self.dropout,
                                       act_fn='relu',
                                       spatial_ratio=2,
-                                      merge_mode=merge_mode,
-                                      kernel_size=kernel_size,
-                                      stride=stride,
-                                      padding=padding,
-                                      output_padding=padding,
-                                      dilation=dilation,
-                                      groups=groups,
-                                      bias=bias,
-                                      padding_mode=padding_mode)
+                                      merge_mode=self.merge_mode,
+                                      kernel_size=self.kernel_size,
+                                      stride=self.stride,
+                                      padding=self.padding,
+                                      dilation=self.dilation,
+                                      groups=self.groups,
+                                      bias=self.bias,
+                                      padding_mode=self.padding_mode)
 
         self.decoder_0 = FinalBlock(in_channels=channels[1],
                                     out_channels=channels[-1],
                                     in_alpha=alphas[1],
                                     out_alpha=alphas[-1],
-                                    batch_norm=batch_norm,
-                                    dropout=dropout,
+                                    batch_norm=self.batch_norm,
+                                    dropout=self.dropout,
                                     act_fn=None,
                                     spatial_ratio=2,
-                                    merge_mode=merge_mode,
+                                    merge_mode=self.merge_mode,
                                     kernel_size=1,
-                                    stride=stride,
+                                    stride=self.stride,
                                     padding=0,
-                                    dilation=dilation,
-                                    groups=groups,
-                                    bias=bias,
-                                    padding_mode=padding_mode)
+                                    dilation=self.dilation,
+                                    groups=self.groups,
+                                    bias=self.bias,
+                                    padding_mode=self.padding_mode)
 
     # pylint: disable=arguments-differ
     def forward(self, inputs):
