@@ -6,7 +6,7 @@ from models.baseline.blocks.conv_block import DoubleConvBlock
 
 class DecoderBlock(nn.Module):
     """
-    Decoder block of octave transposed convolution and double octave convolution.
+    Decoder block of  transposed convolution and double octave convolution.
     """
 
     def __init__(self, in_channels,
@@ -49,7 +49,7 @@ class DecoderBlock(nn.Module):
             raise NotImplementedError
 
         self.double_conv = DoubleConvBlock(
-            in_channels * 2,
+            in_channels,
             mid_channels,
             out_channels,
             batch_norm=batch_norm,
