@@ -72,7 +72,7 @@ class BaselineUNet(UNetBackBone):
                                          padding_mode=self.padding_mode))
 
         i = len(decoder_input_channels)
-        for input_channel, output_channel, input_alpha, output_alpha in zip(
+        for input_channel, output_channel in zip(
                 decoder_input_channels, decoder_output_channels):
             self.add_module('decoder_{}'.format(i),
                             DecoderBlock(in_channels=input_channel,
