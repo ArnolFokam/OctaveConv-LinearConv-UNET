@@ -92,7 +92,8 @@ class BaselineUNet(UNetBackBone):
                                          bias=self.bias,
                                          padding_mode=self.padding_mode))
 
-        i -= 1
+            i -= 1
+
         self.add_module('decoder_0',
                         ConvBlock(in_channels=self.channels[1],
                                   out_channels=self.channels[-1],
