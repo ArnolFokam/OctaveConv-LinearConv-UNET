@@ -37,10 +37,10 @@ class BaselineUNet(UNetBackBone):
         decoder_input_channels = self.channels[-2:0:-1]
         decoder_output_channels = self.channels[-3:0:-1] + self.channels[1:2]
 
-        self.add_module("enc1",
+        self.add_module("encoder_0",
                         DoubleConvBlock(in_channels=self.channels[0],
                                         mid_channels=self.channels[1],
-                                        out_channels=self.output_channels[1],
+                                        out_channels=self.channels[1],
                                         batch_norm=self.batch_norm,
                                         dropout=self.dropout,
                                         act_fn='relu',
