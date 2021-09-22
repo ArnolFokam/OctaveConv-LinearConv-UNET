@@ -22,13 +22,12 @@ class EncoderBlock(nn.Module):
                  padding_mode='zeros'):
         super(EncoderBlock, self).__init__()
 
+        # TODO: Add parameter for stride pooling
         if downsample == 'max':
-            self.downsample = nn.MaxPool2d(kernel_size=kernel_size,
-                                           stride=stride)
+            self.downsample = nn.MaxPool2d(kernel_size=scale_factor)
 
         elif downsample == 'avg':
-            self.downsample = nn.AvgPool2d(kernel_size=kernel_size,
-                                           stride=stride)
+            self.downsample = nn.AvgPool2d(kernel_size=scale_factor)
 
         elif downsample == 'conv':
             self.downsample = ConvBlock(in_channels,
