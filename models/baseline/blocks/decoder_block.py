@@ -61,8 +61,11 @@ class DecoderBlock(nn.Module):
 
     # pylint: disable=arguments-differ
     def forward(self, x, skip_x):
+        print('yo')
+        print(x.shape, skip_x.shape)
         x = self.upsample(x)
-        x = torch.cat([x, skip_x], dim=1)
+        print(x.shape, skip_x.shape)
+        x = torch.cat((x, skip_x), dim=1)
         x = self.double_conv(x)
 
         return x
