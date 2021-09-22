@@ -6,6 +6,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import torch
+
 from models.octave.blocks.initial_block import InitialBlock
 from models.octave.blocks.encoder_block import EncoderBlock
 from models.octave.blocks.decoder_block import DecoderBlock
@@ -194,4 +196,4 @@ class OctaveUNet(UNetBackBone):
                     locals()['en' + name[2:-1] + str(
                         int(name[-1]) - 1) + '_l'])
 
-        return outputs
+        return torch.sigmoid(outputs)

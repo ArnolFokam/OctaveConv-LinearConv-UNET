@@ -1,3 +1,5 @@
+import torch
+
 from models.baseline.blocks.conv_block import DoubleConvBlock, ConvBlock
 from models.baseline.blocks.decoder_block import DecoderBlock
 from models.baseline.blocks.encoder_block import EncoderBlock
@@ -137,4 +139,4 @@ class BaselineUNet(UNetBackBone):
                     locals()['en' + name[2:-1] +
                              str(int(name[-1]) - 1)])
 
-        return outputs
+        return torch.sigmoid(outputs)
