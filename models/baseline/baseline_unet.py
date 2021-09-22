@@ -111,14 +111,15 @@ class BaselineUNet(UNetBackBone):
                                   padding_mode=self.padding_mode))
 
     def forward(self, inputs):
-        print(locals())
 
         for name, module in self.named_children():
             if name == 'encoder_0':
                 locals()[name] = module(inputs)
 
             elif name == 'decoder_0':
-                outputs = module(locals()[name[:-1]])
+                # merge last decoder with
+                # previous decoder 'decoder_1'
+                outputs = module(locals()[name[:-1]] + '1')
 
             elif name == 'decoder_{}'.format(len(self.channels) - 2):
                 locals()[name] = module(
@@ -131,7 +132,6 @@ class BaselineUNet(UNetBackBone):
                     locals()[name[:-1] + str(int(name[-1]) - 1)])
 
             elif 'decoder_' in name:
-                print(name)
                 locals()[name] = module(
                     locals()[name[:-1] + str(int(name[-1]) + 1)],
                     locals()['en' + name[2:-1] +
