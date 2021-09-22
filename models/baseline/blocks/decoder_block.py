@@ -31,7 +31,7 @@ class DecoderBlock(nn.Module):
         if upsample == 'transp':
             self.upsample = nn.ConvTranspose2d(in_channels,
                                                out_channels,
-                                               kernel_size=scale_factor,
+                                               kernel_size=kernel_size,
                                                stride=pooling_stride,
                                                padding=padding,
                                                output_padding=output_padding,
