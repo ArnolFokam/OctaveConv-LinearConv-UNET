@@ -20,7 +20,7 @@ class EncoderBlock(nn.Module):
                  groups=1,
                  bias=True,
                  padding_mode='zeros',
-                 pooling_stride=None):
+                 pooling_stride=2):
         super(EncoderBlock, self).__init__()
 
         if downsample == 'max':

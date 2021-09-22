@@ -93,7 +93,8 @@ class BaselineUNet(UNetBackBone):
                                          dilation=self.dilation,
                                          groups=self.groups,
                                          bias=self.bias,
-                                         padding_mode=self.padding_mode))
+                                         padding_mode=self.padding_mode,
+                                         pooling_stride=self.pooling_stride))
 
             i -= 1
 

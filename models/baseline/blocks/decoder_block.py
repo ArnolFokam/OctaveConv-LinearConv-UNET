@@ -25,7 +25,7 @@ class DecoderBlock(nn.Module):
                  groups=1,
                  bias=True,
                  padding_mode='zeros',
-                 pooling_stride=None):
+                 pooling_stride=2):
         super(DecoderBlock, self).__init__()
 
         if upsample == 'transp':
