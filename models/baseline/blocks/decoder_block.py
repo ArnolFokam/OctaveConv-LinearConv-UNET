@@ -29,7 +29,7 @@ class DecoderBlock(nn.Module):
 
         if upsample == 'transp':
             self.upsample = nn.ConvTranspose2d(in_channels,
-                                               out_channels,
+                                               in_channels,
                                                kernel_size=kernel_size,
                                                stride=scale_factor,
                                                padding=padding,
@@ -48,7 +48,7 @@ class DecoderBlock(nn.Module):
             raise NotImplementedError
 
         self.double_conv = DoubleConvBlock(
-            in_channels,
+            in_channels*2,
             mid_channels,
             out_channels,
             batch_norm=batch_norm,
