@@ -18,7 +18,7 @@ class DecoderBlock(nn.Module):
                  dropout=False,
                  act_fn=None,
                  kernel_size=3,
-                 stride=1,
+                 stride=2,
                  padding=1,
                  output_padding=1,
                  dilation=1,
