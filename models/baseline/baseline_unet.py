@@ -60,7 +60,7 @@ class BaselineUNet(UNetBackBone):
                             EncoderBlock(in_channels=input_channel,
                                          mid_channels=output_channel,
                                          out_channels=output_channel,
-                                         downsample='avg',
+                                         downsample='max',
                                          scale_factor=2,
                                          batch_norm=self.batch_norm,
                                          dropout=self.dropout,
