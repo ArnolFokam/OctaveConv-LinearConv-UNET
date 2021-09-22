@@ -119,7 +119,7 @@ class BaselineUNet(UNetBackBone):
             elif name == 'decoder_0':
                 # merge last decoder with
                 # previous decoder 'decoder_1'
-                outputs = module(locals()[name[:-1]] + '1')
+                outputs = module(locals()[name[:-1] + '1'])
 
             elif name == 'decoder_{}'.format(len(self.channels) - 2):
                 locals()[name] = module(
