@@ -17,7 +17,7 @@ class BaselineUNet(UNetBackBone):
                  batch_norm=True,
                  dropout=False,
                  padding_mode='zeros',
-                 merge_mode='padding'):
+                 pooling_stride=None):
         super(BaselineUNet, self).__init__(
             channels,
             kernel_size,
@@ -29,7 +29,7 @@ class BaselineUNet(UNetBackBone):
             batch_norm,
             dropout,
             padding_mode,
-            merge_mode)
+            pooling_stride)
 
         encoder_input_channels = self.channels[1:-1]
         encoder_output_channels = self.channels[2:-1] + self.channels[-2:-1]
@@ -60,6 +60,8 @@ class BaselineUNet(UNetBackBone):
                             EncoderBlock(in_channels=input_channel,
                                          mid_channels=output_channel,
                                          out_channels=output_channel,
+                                         downsample='avg',
+                                         scale_factor=2,
                                          batch_norm=self.batch_norm,
                                          dropout=self.dropout,
                                          act_fn='relu',
@@ -69,7 +71,8 @@ class BaselineUNet(UNetBackBone):
                                          dilation=self.dilation,
                                          groups=self.groups,
                                          bias=self.bias,
-                                         padding_mode=self.padding_mode))
+                                         padding_mode=self.padding_mode,
+                                         pooling_stride=self.pooling_stride))
 
         i = len(decoder_input_channels)
         for input_channel, output_channel in zip(

@@ -16,7 +16,7 @@ class UNetBackBone(nn.Module):
                  batch_norm=True,
                  dropout=False,
                  padding_mode='zeros',
-                 merge_mode='padding'):
+                 pooling_stride=None):
         super(UNetBackBone, self).__init__()
         self.channels = channels
         self.kernel_size = kernel_size
@@ -28,4 +28,4 @@ class UNetBackBone(nn.Module):
         self.batch_norm = batch_norm
         self.dropout = dropout
         self.padding_mode = padding_mode
-        self.merge_mode = merge_mode
+        self.pooling_stride = pooling_stride
