@@ -1,6 +1,6 @@
 import torch
-import torch.nn as nn
-import torch.nn.functional as F
+from torch import nn
+from torch.autograd.grad_mode import F
 
 
 class DiceLossOld(nn.Module):
