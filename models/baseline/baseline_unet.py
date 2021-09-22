@@ -131,7 +131,8 @@ class BaselineUNet(UNetBackBone):
                     locals()[name[:-1] + str(int(name[-1]) - 1)])
 
             elif 'decoder_' in name:
-                locals()[name + '_h'] = module(
+                print(name)
+                locals()[name] = module(
                     locals()[name[:-1] + str(int(name[-1]) + 1)],
                     locals()['en' + name[2:-1] +
                              str(int(name[-1]) - 1)])
