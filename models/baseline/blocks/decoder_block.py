@@ -20,7 +20,7 @@ class DecoderBlock(nn.Module):
                  kernel_size=3,
                  stride=2,
                  padding=1,
-                 output_padding=1,
+                 output_padding=0,
                  dilation=1,
                  groups=1,
                  bias=True,
