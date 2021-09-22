@@ -24,20 +24,21 @@ class DecoderBlock(nn.Module):
                  dilation=1,
                  groups=1,
                  bias=True,
-                 padding_mode='zeros'):
+                 padding_mode='zeros',
+                 pooling_stride=None):
         super(DecoderBlock, self).__init__()
 
         if upsample == 'transp':
             self.upsample = nn.ConvTranspose2d(in_channels,
                                                out_channels,
-                                               kernel_size,
-                                               stride,
-                                               padding,
-                                               output_padding,
-                                               groups,
-                                               bias,
-                                               dilation,
-                                               padding_mode)
+                                               kernel_size=scale_factor,
+                                               stride=pooling_stride,
+                                               padding=padding,
+                                               output_padding=output_padding,
+                                               groups=groups,
+                                               bias=bias,
+                                               dilation=dilation,
+                                               padding_mode=padding_mode)
 
         elif upsample in ('bilinear', 'nearest'):
             self.upsample = nn.Upsample(
