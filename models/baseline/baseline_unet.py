@@ -111,6 +111,7 @@ class BaselineUNet(UNetBackBone):
                                   padding_mode=self.padding_mode))
 
     def forward(self, inputs):
+        print(locals())
 
         for name, module in self.named_children():
             if name == 'encoder_0':
