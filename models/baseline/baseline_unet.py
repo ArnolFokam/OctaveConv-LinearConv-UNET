@@ -93,9 +93,7 @@ class BaselineUNet(UNetBackBone):
                                          dilation=self.dilation,
                                          groups=self.groups,
                                          bias=self.bias,
-                                         padding_mode=self.padding_mode,
-                                         pooling_stride=self.pooling_stride))
-
+                                         padding_mode=self.padding_mode))
             i -= 1
 
         self.add_module('decoder_0',

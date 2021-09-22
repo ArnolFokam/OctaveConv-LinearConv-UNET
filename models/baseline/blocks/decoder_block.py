@@ -18,21 +18,20 @@ class DecoderBlock(nn.Module):
                  dropout=False,
                  act_fn=None,
                  kernel_size=3,
-                 stride=2,
+                 stride=1,
                  padding=1,
-                 output_padding=0,
+                 output_padding=1,
                  dilation=1,
                  groups=1,
                  bias=True,
-                 padding_mode='zeros',
-                 pooling_stride=2):
+                 padding_mode='zeros'):
         super(DecoderBlock, self).__init__()
 
         if upsample == 'transp':
             self.upsample = nn.ConvTranspose2d(in_channels,
                                                out_channels,
                                                kernel_size=kernel_size,
-                                               stride=pooling_stride,
+                                               stride=scale_factor,
                                                padding=padding,
                                                output_padding=output_padding,
                                                groups=groups,
@@ -43,8 +42,7 @@ class DecoderBlock(nn.Module):
         elif upsample in ('bilinear', 'nearest'):
             self.upsample = nn.Upsample(
                 scale_factor=scale_factor,
-                mode=upsample,
-                align_corners=True)
+                mode=upsample)
 
         else:
             raise NotImplementedError
