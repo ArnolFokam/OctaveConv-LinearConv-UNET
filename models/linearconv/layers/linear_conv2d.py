@@ -6,7 +6,7 @@ from torch.nn.modules.conv import _ConvNd
 from torch.nn.modules.utils import _pair
 
 
-class LinearConv2D(_ConvNd):
+class _LinearConv2D(_ConvNd):
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -23,7 +23,7 @@ class LinearConv2D(_ConvNd):
         padding_ = padding if isinstance(padding, str) else _pair(padding)
         dilation_ = _pair(dilation)
 
-        super(LinearConv2D, self).__init__(
+        super(_LinearConv2D, self).__init__(
             in_channels,
             out_channels,
             kernel_size_,
@@ -49,6 +49,33 @@ class LinearConv2D(_ConvNd):
 
         self.conv_weights = nn.Parameter(
             torch.Tensor(out_channels // self.times, in_channels, kernel_size, kernel_size))
+
+        nn.init.xavier_uniform_(self.conv_weights)
+
+
+class LinearConv2DSimple(_LinearConv2D):
+    def __init__(self,
+                 in_channels,
+                 out_channels,
+                 kernel_size,
+                 padding=0,
+                 stride=1,
+                 groups=1,
+                 bias=True,
+                 dilation=1,
+                 padding_mode='zeros'):
+
+        super(LinearConv2DSimple, self).__init__(
+            in_channels,
+            out_channels,
+            kernel_size,
+            padding,
+            stride,
+            groups,
+            bias,
+            dilation,
+            padding_mode)
+
         self.linear_weights = nn.Parameter(
             torch.Tensor(out_channels - out_channels // self.times, out_channels // self.times))
 
@@ -72,7 +99,6 @@ class LinearConv2D(_ConvNd):
                         groups=self.groups)
 
     def forward(self, inputs):
-        print(self.kernel_size)
         correlated_weights = torch.mm(self.linear_weights,
                                       self.conv_weights.reshape(self.out_channels // self.times, -1)) \
             .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size,
@@ -120,7 +146,7 @@ class LinearConv2D(_ConvNd):
 
 
 # Const. low-rank version
-class LinearConv2DLowRank(_ConvNd):
+class LinearConv2DLowRank(_LinearConv2D):
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -128,47 +154,29 @@ class LinearConv2DLowRank(_ConvNd):
                  padding=0,
                  stride=1,
                  groups=1,
+                 bias=True,
                  dilation=1,
                  padding_mode='zeros',
-                 bias=True,
-                 rank=1, ):
-        kernel_size_ = _pair(kernel_size)
-        stride_ = _pair(stride)
-        padding_ = padding if isinstance(padding, str) else _pair(padding)
-        dilation_ = _pair(dilation)
+                 rank=1):
+
         super(LinearConv2DLowRank, self).__init__(
             in_channels,
             out_channels,
-            kernel_size_,
-            stride_,
-            padding_,
-            dilation_,
-            False,
-            _pair(0),
+            kernel_size,
+            padding,
+            stride,
             groups,
             bias,
-            padding_mode
-        )
+            dilation,
+            padding_mode)
 
         self.rank = rank
-        self.times = 2  # ratio 1/2
 
         # we don't need pytorch generated
         # weights from _ConvNd since we
         # initialize our own weights
         del self.weight
 
-        # we don't need pytorch generated
-        # weights from _ConvNd since we
-        # initialize our own weights
-        del self.weight
-
-        if bias:
-            self.bias = nn.Parameter(torch.Tensor(out_channels))
-            self.bias.data.uniform_(-0.1, 0.1)
-
-        self.conv_weights = nn.Parameter(
-            torch.Tensor(out_channels // self.times, in_channels, kernel_size, kernel_size))
         self.column_weights = nn.Parameter(torch.Tensor(out_channels - out_channels // self.times, self.rank))
         self.row_weights = nn.Parameter(torch.Tensor(self.rank, out_channels // self.times))
 
@@ -244,7 +252,7 @@ class LinearConv2DLowRank(_ConvNd):
 
 
 # Rank-ratio version
-class LinearConv2DRankRatio(_ConvNd):
+class LinearConv2DRankRatio(_LinearConv2D):
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -252,47 +260,29 @@ class LinearConv2DRankRatio(_ConvNd):
                  padding=0,
                  stride=1,
                  groups=1,
+                 bias=True,
                  dilation=1,
                  padding_mode='zeros',
-                 bias=True,
                  rank=1):
-        kernel_size_ = _pair(kernel_size)
-        stride_ = _pair(stride)
-        padding_ = padding if isinstance(padding, str) else _pair(padding)
-        dilation_ = _pair(dilation)
+
         super(LinearConv2DRankRatio, self).__init__(
             in_channels,
             out_channels,
-            kernel_size_,
-            stride_,
-            padding_,
-            dilation_,
-            False,
-            _pair(0),
+            kernel_size,
+            padding,
+            stride,
             groups,
             bias,
-            padding_mode
-        )
+            dilation,
+            padding_mode)
 
         self.rank = rank
-        self.times = 2  # ratio 1/2
 
         # we don't need pytorch generated
         # weights from _ConvNd since we
         # initialize our own weights
         del self.weight
 
-        # we don't need pytorch generated
-        # weights from _ConvNd since we
-        # initialize our own weights
-        del self.weight
-
-        if bias:
-            self.bias = nn.Parameter(torch.Tensor(out_channels))
-            self.bias.data.uniform_(-0.1, 0.1)
-
-        self.conv_weights = nn.Parameter(
-            torch.Tensor(out_channels // self.times, in_channels, kernel_size, kernel_size))
         self.column_weights = nn.Parameter(
             torch.Tensor(out_channels - out_channels // self.times, int((out_channels // self.times) * self.rank)))
         self.row_weights = nn.Parameter(
@@ -330,7 +320,7 @@ class LinearConv2DRankRatio(_ConvNd):
 
 
 # Sparse version
-class LinearConv2DSparse(_ConvNd):
+class LinearConv2DSparse(_LinearConv2D):
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -344,56 +334,28 @@ class LinearConv2DSparse(_ConvNd):
                  thresh_step=0.00001,
                  dilation=1,
                  bias=True):
-        kernel_size_ = _pair(kernel_size)
-        stride_ = _pair(stride)
-        padding_ = padding if isinstance(padding, str) else _pair(padding)
-        dilation_ = _pair(dilation)
         super(LinearConv2DSparse, self).__init__(
             in_channels,
             out_channels,
-            kernel_size_,
-            stride_,
-            padding_,
-            dilation_,
-            False,
-            _pair(0),
+            kernel_size,
+            padding,
+            stride,
             groups,
             bias,
-            padding_mode
+            dilation,
+            padding_mode,
         )
 
-        self.times = 2  # ratio 1/2
         self.prune_step = prune_step
         self.req_percentile = req_percentile
         self.thresh_step = thresh_step
         self.counter = 0
         self.threshold = 0
 
-        # we don't need pytorch generated
-        # weights from _ConvNd since we
-        # initialize our own weights
-        del self.weight
-
-        # we don't need pytorch generated
-        # weights from _ConvNd since we
-        # initialize our own weights
-        del self.weight
-
-        if bias:
-            self.bias = nn.Parameter(torch.Tensor(out_channels))
-            self.bias.data.uniform_(-0.1, 0.1)
-
-        self.conv_weights = nn.Parameter(
-            torch.Tensor(out_channels // self.times, in_channels, kernel_size, kernel_size))
         self.linear_weights = nn.Parameter(
             torch.Tensor(out_channels - out_channels // self.times, out_channels // self.times))
 
-        nn.init.xavier_uniform_(self.conv_weights)
         self.linear_weights.data.uniform_(-0.1, 0.1)
-
-        if self.biasTrue:
-            self.bias = nn.Parameter(torch.Tensor(out_channels))
-            self.bias.data.uniform_(-0.1, 0.1)
 
         self.mask = nn.Parameter(torch.abs(self.linear_weights) > self.threshold, requires_grad=False)
         self.mask.requires_grad = False
