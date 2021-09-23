@@ -37,7 +37,7 @@ class LinearConvBlock(nn.Module):
         if variant == 'linear_simple':
             self.conv = LinearConv2DSimple(in_channels,
                                            out_channels,
-                                           kernel_size=1,
+                                           kernel_size=kernel_size,
                                            stride=stride,
                                            padding=padding,
                                            dilation=dilation,
@@ -48,7 +48,7 @@ class LinearConvBlock(nn.Module):
         elif variant == 'linear_lowrank':
             self.conv = LinearConv2DLowRank(in_channels,
                                             out_channels,
-                                            kernel_size=1,
+                                            kernel_size=kernel_size,
                                             stride=stride,
                                             padding=padding,
                                             dilation=dilation,
@@ -60,7 +60,7 @@ class LinearConvBlock(nn.Module):
         elif variant == 'linear_rankratio':
             self.conv = LinearConv2DLowRank(in_channels,
                                             out_channels,
-                                            kernel_size=1,
+                                            kernel_size=kernel_size,
                                             stride=stride,
                                             padding=padding,
                                             dilation=dilation,
@@ -72,7 +72,7 @@ class LinearConvBlock(nn.Module):
         elif variant == 'linear_sparse':
             self.conv = LinearConv2DSparse(in_channels,
                                            out_channels,
-                                           kernel_size=1,
+                                           kernel_size=kernel_size,
                                            stride=stride,
                                            padding=padding,
                                            dilation=dilation,
