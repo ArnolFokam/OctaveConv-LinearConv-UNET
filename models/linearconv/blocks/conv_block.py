@@ -26,6 +26,14 @@ class LinearConvBlock(nn.Module):
                  thresh_step=0.00001):
         super(LinearConvBlock, self).__init__()
 
+        possible_variants = ['linear_simple',
+                             'linear_lowrank',
+                             'linear_rankratio',
+                             'linear_sparse']
+
+        if variant is not None and variant not in possible_variants:
+            raise ValueError('variants can only be {}'.format(possible_variants))
+
         if variant == 'linear_simple':
             self.conv = LinearConv2D(in_channels,
                                      out_channels,
@@ -80,8 +88,8 @@ class LinearConvBlock(nn.Module):
                                   out_channels,
                                   kernel_size=kernel_size,
                                   stride=stride,
-                                  padding=padding,
                                   dilation=dilation,
+                                  padding=padding,
                                   groups=groups,
                                   bias=bias,
                                   padding_mode=padding_mode)

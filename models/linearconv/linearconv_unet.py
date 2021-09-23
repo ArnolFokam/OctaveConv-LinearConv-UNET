@@ -10,6 +10,7 @@ class LinearConvUNet(UNetBackBone):
 
     def __init__(self,
                  channels=None,
+                 variants=None,
                  kernel_size=3,
                  stride=2,
                  padding=1,
@@ -32,6 +33,7 @@ class LinearConvUNet(UNetBackBone):
             dropout,
             padding_mode)
 
+        encoder_variants = self.variants[1:-1]
         encoder_input_channels = self.channels[1:-1]
         encoder_output_channels = self.channels[2:-1] + self.channels[-2:-1]
 
@@ -51,11 +53,13 @@ class LinearConvUNet(UNetBackBone):
                                               dilation=self.dilation,
                                               groups=self.groups,
                                               bias=self.bias,
-                                              padding_mode=self.padding_mode))
+                                              padding_mode=self.padding_mode,
+                                              variant=variants[0]))
 
         i = 0
-        for input_channel, output_channel in zip(encoder_input_channels,
-                                                 encoder_output_channels):
+        for input_channel, output_channel, variant in zip(encoder_input_channels,
+                                                          encoder_output_channels,
+                                                          encoder_variants):
             i += 1
             self.add_module('encoder_{}'.format(i),
                             EncoderBlock(in_channels=input_channel,
@@ -72,7 +76,8 @@ class LinearConvUNet(UNetBackBone):
                                          dilation=self.dilation,
                                          groups=self.groups,
                                          bias=self.bias,
-                                         padding_mode=self.padding_mode))
+                                         padding_mode=self.padding_mode,
+                                         variant=variant))
 
         i = len(decoder_input_channels)
         for input_channel, output_channel in zip(
