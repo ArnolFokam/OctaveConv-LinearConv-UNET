@@ -52,7 +52,7 @@ class LinearConv2D(_ConvNd):
         self.linear_weights = nn.Parameter(
             torch.Tensor(out_channels - out_channels // self.times, out_channels // self.times))
 
-        torch.nn.init.xavier_uniform(self.conv_weights)
+        nn.init.xavier_uniform_(self.conv_weights)
         self.linear_weights.data.uniform_(-0.1, 0.1)
 
     def _conv_forward(self, inputs, weight, bias):
@@ -171,7 +171,7 @@ class LinearConv2DLowRank(_ConvNd):
         self.column_weights = nn.Parameter(torch.Tensor(out_channels - out_channels // self.times, self.rank))
         self.row_weights = nn.Parameter(torch.Tensor(self.rank, out_channels // self.times))
 
-        torch.nn.init.xavier_uniform(self.conv_weights)
+        nn.init.xavier_uniform_(self.conv_weights)
         self.column_weights.data.uniform_(-0.1, 0.1)
         self.row_weights.data.uniform_(-0.1, 0.1)
 
@@ -297,7 +297,7 @@ class LinearConv2DRankRatio(_ConvNd):
         self.row_weights = nn.Parameter(
             torch.Tensor(int((out_channels // self.times) * self.rank), out_channels // self.times))
 
-        torch.nn.init.xavier_uniform(self.conv_weights)
+        nn.init.xavier_uniform_(self.conv_weights)
         self.column_weights.data.uniform_(-0.1, 0.1)
         self.row_weights.data.uniform_(-0.1, 0.1)
 
@@ -387,7 +387,7 @@ class LinearConv2DSparse(_ConvNd):
         self.linear_weights = nn.Parameter(
             torch.Tensor(out_channels - out_channels // self.times, out_channels // self.times))
 
-        torch.nn.init.xavier_uniform(self.conv_weights)
+        nn.init.xavier_uniform_(self.conv_weights)
         self.linear_weights.data.uniform_(-0.1, 0.1)
 
         if self.biasTrue:
