@@ -33,7 +33,7 @@ class LinearConvUNet(UNetBackBone):
             dropout,
             padding_mode)
 
-        encoder_variants = self.variants[1:-1]
+        encoder_variants = variants[1:-1]
         encoder_input_channels = self.channels[1:-1]
         encoder_output_channels = self.channels[2:-1] + self.channels[-2:-1]
 
