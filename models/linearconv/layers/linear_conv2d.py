@@ -52,9 +52,25 @@ class LinearConv2D(_ConvNd):
         torch.nn.init.xavier_uniform(self.conv_weights)
         self.linear_weights.data.uniform_(-0.1, 0.1)
 
-        if self.biasTrue:
+        if self.bias:
             self.bias = nn.Parameter(torch.Tensor(out_channels))
             self.bias.data.uniform_(-0.1, 0.1)
+
+    def _conv_forward(self, inputs, weight, bias):
+        if self.padding_mode != 'zeros':
+            return F.conv2d(F.pad(inputs, self._reversed_padding_repeated_twice, mode=self.padding_mode),
+                            weight, bias,
+                            stride=self.stride,
+                            padding=_pair(0),
+                            dilation=self.dilation,
+                            groups=self.groups)
+        return F.conv2d(inputs,
+                        weight,
+                        bias,
+                        stride=self.stride,
+                        padding=self.padding,
+                        dilation=self.dilation,
+                        groups=self.groups)
 
     def forward(self, inputs):
         correlated_weights = torch.mm(self.linear_weights,
@@ -62,12 +78,9 @@ class LinearConv2D(_ConvNd):
             .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size,
                      self.kernel_size)
 
-        if self.biasTrue:
-            return F.conv2d(inputs, torch.cat((self.conv_weights, correlated_weights), dim=0), bias=self.bias,
-                            padding=self.padding, stride=self.stride, dilation=self.dilation)
-        else:
-            return F.conv2d(inputs, torch.cat((self.conv_weights, correlated_weights), dim=0),
-                            padding=self.padding, stride=self.stride, dilation=self.dilation)
+        return self._conv_forward(inputs,
+                                  torch.cat((self.conv_weights, correlated_weights), dim=0),
+                                  bias=self.bias)
 
     @staticmethod
     def count_op_LinearConv2D(m, x, y):
@@ -193,7 +206,7 @@ class LinearConv2DLowRank(_ConvNd):
         total_mul_2 = m.rank
         total_add_2 = total_mul_2 - 1
         num_elements_2 = (m.out_channels - m.out_channels // m.times) * (
-                    cin * kh * kw)  # (m.out_channels - m.out_channels//m.times)
+                cin * kh * kw)  # (m.out_channels - m.out_channels//m.times)
         lin_ops = (total_mul_1 + total_add_1) * num_elements_1 + (total_mul_2 + total_add_2) * num_elements_2
         total_ops = lin_ops + conv_ops
         print(lin_ops, conv_ops)
