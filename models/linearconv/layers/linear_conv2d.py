@@ -18,6 +18,7 @@ class _LinearConv2D(_ConvNd):
                  dilation=1,
                  padding_mode='zeros'):
         self.kernel_size_int = kernel_size
+        print(kernel_size)
         kernel_size_ = _pair(kernel_size)
         stride_ = _pair(stride)
         padding_ = padding if isinstance(padding, str) else _pair(padding)
