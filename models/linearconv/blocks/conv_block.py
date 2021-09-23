@@ -1,6 +1,6 @@
 from torch import nn
 
-from models.linearconv.layers.linear_conv2d import LinearConv2D, LinearConv2DSparse, LinearConv2DLowRank
+from models.linearconv.layers.linear_conv2d import LinearConv2DSimple, LinearConv2DSparse, LinearConv2DLowRank
 
 
 class LinearConvBlock(nn.Module):
@@ -35,15 +35,15 @@ class LinearConvBlock(nn.Module):
             raise ValueError('variants can only be {}'.format(possible_variants))
 
         if variant == 'linear_simple':
-            self.conv = LinearConv2D(in_channels,
-                                     out_channels,
-                                     kernel_size=1,
-                                     stride=stride,
-                                     padding=padding,
-                                     dilation=dilation,
-                                     groups=groups,
-                                     bias=bias,
-                                     padding_mode=padding_mode)
+            self.conv = LinearConv2DSimple(in_channels,
+                                           out_channels,
+                                           kernel_size=1,
+                                           stride=stride,
+                                           padding=padding,
+                                           dilation=dilation,
+                                           groups=groups,
+                                           bias=bias,
+                                           padding_mode=padding_mode)
 
         elif variant == 'linear_lowrank':
             self.conv = LinearConv2DLowRank(in_channels,
