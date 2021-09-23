@@ -1,6 +1,3 @@
-from collections import OrderedDict
-
-import torch
 from torch import nn
 
 
@@ -15,8 +12,7 @@ class UNetBackBone(nn.Module):
                  bias=True,
                  batch_norm=True,
                  dropout=False,
-                 padding_mode='zeros',
-                 pooling_stride=None):
+                 padding_mode='zeros'):
         super(UNetBackBone, self).__init__()
         self.channels = channels
         self.kernel_size = kernel_size
@@ -28,4 +24,3 @@ class UNetBackBone(nn.Module):
         self.batch_norm = batch_norm
         self.dropout = dropout
         self.padding_mode = padding_mode
-        self.pooling_stride = pooling_stride

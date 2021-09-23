@@ -19,7 +19,6 @@ class LinearConvUNet(UNetBackBone):
                  batch_norm=True,
                  dropout=False,
                  padding_mode='zeros',
-                 pooling_stride=None,
                  ):
         super(LinearConvUNet, self).__init__(
             channels,
@@ -31,8 +30,7 @@ class LinearConvUNet(UNetBackBone):
             bias,
             batch_norm,
             dropout,
-            padding_mode,
-            pooling_stride)
+            padding_mode)
 
         encoder_input_channels = self.channels[1:-1]
         encoder_output_channels = self.channels[2:-1] + self.channels[-2:-1]
@@ -74,8 +72,7 @@ class LinearConvUNet(UNetBackBone):
                                          dilation=self.dilation,
                                          groups=self.groups,
                                          bias=self.bias,
-                                         padding_mode=self.padding_mode,
-                                         pooling_stride=self.pooling_stride))
+                                         padding_mode=self.padding_mode))
 
         i = len(decoder_input_channels)
         for input_channel, output_channel in zip(

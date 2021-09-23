@@ -20,7 +20,6 @@ class EncoderBlock(nn.Module):
                  groups=1,
                  bias=True,
                  padding_mode='zeros',
-                 pooling_stride=2,
                  variant=None,
                  rank=1,
                  prune_step=500,
@@ -30,11 +29,11 @@ class EncoderBlock(nn.Module):
 
         if downsample == 'max':
             self.downsample = nn.MaxPool2d(kernel_size=scale_factor,
-                                           stride=pooling_stride)
+                                           stride=scale_factor)
 
         elif downsample == 'avg':
             self.downsample = nn.AvgPool2d(kernel_size=scale_factor,
-                                           stride=pooling_stride)
+                                           stride=scale_factor)
 
         elif downsample == 'conv':
             self.downsample = LinearConvBlock(in_channels,

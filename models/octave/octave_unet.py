@@ -41,8 +41,7 @@ class OctaveUNet(UNetBackBone):
             bias,
             batch_norm,
             dropout,
-            padding_mode,
-            merge_mode)
+            padding_mode)
 
         if alphas is None:
             alphas = [0.5] * 6
