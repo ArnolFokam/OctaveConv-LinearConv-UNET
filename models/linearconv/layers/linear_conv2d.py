@@ -17,7 +17,7 @@ class _LinearConv2D(_ConvNd):
                  bias=True,
                  dilation=1,
                  padding_mode='zeros'):
-
+        self.kernel_size_int = kernel_size
         kernel_size_ = _pair(kernel_size)
         stride_ = _pair(stride)
         padding_ = padding if isinstance(padding, str) else _pair(padding)
@@ -101,8 +101,8 @@ class LinearConv2DSimple(_LinearConv2D):
     def forward(self, inputs):
         correlated_weights = torch.mm(self.linear_weights,
                                       self.conv_weights.reshape(self.out_channels // self.times, -1)) \
-            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size[0],
-                     self.kernel_size[0])
+            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size_int,
+                     self.kernel_size_int)
 
         return self._conv_forward(inputs,
                                   torch.cat((self.conv_weights, correlated_weights), dim=0),
@@ -187,8 +187,8 @@ class LinearConv2DLowRank(_LinearConv2D):
     def forward(self, inputs):
         correlated_weights = torch.mm(self.column_weights, torch.mm(self.row_weights, self.conv_weights.reshape(
             self.out_channels // self.times, -1))) \
-            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size[0],
-                     self.kernel_size[0])
+            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size_int,
+                     self.kernel_size_int)
 
         return self._conv_forward(inputs,
                                   torch.cat((self.conv_weights, correlated_weights), dim=0),
@@ -279,8 +279,8 @@ class LinearConv2DRankRatio(_LinearConv2D):
     def forward(self, inputs):
         correlated_weights = torch.mm(self.column_weights, torch.mm(self.row_weights, self.conv_weights.reshape(
             self.out_channels // self.times, -1))) \
-            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size[0],
-                     self.kernel_size[0])
+            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size_int,
+                     self.kernel_size_int)
 
         return self._conv_forward(inputs,
                                   torch.cat((self.conv_weights, correlated_weights), dim=0),
@@ -342,8 +342,8 @@ class LinearConv2DSparse(_LinearConv2D):
         self.mask = nn.Parameter(self.mask.type(torch.FloatTensor).to(self.device), requires_grad=False)
         temp = self.linear_weights * self.mask
         correlated_weights = torch.mm(temp, self.conv_weights.reshape(self.out_channels // self.times, -1)) \
-            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size[0],
-                     self.kernel_size[0])
+            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size_int,
+                     self.kernel_size_int)
 
         return self._conv_forward(inputs,
                                   torch.cat((self.conv_weights, correlated_weights), dim=0),
