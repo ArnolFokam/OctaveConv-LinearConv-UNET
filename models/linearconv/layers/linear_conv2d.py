@@ -10,12 +10,12 @@ class _LinearConv2D(_ConvNd):
     def __init__(self,
                  in_channels,
                  out_channels,
-                 kernel_size,
-                 padding=0,
+                 kernel_size=3,
                  stride=1,
+                 padding=1,
+                 dilation=1,
                  groups=1,
                  bias=True,
-                 dilation=1,
                  padding_mode='zeros'):
         self.kernel_size_int = kernel_size
         print(kernel_size)
@@ -86,11 +86,11 @@ class LinearConv2DSimple(_LinearConv2D):
             in_channels,
             out_channels,
             kernel_size,
-            padding,
             stride,
+            padding,
+            dilation,
             groups,
             bias,
-            dilation,
             padding_mode)
 
         self.linear_weights = nn.Parameter(
@@ -164,11 +164,11 @@ class LinearConv2DLowRank(_LinearConv2D):
             in_channels,
             out_channels,
             kernel_size,
-            padding,
             stride,
+            padding,
+            dilation,
             groups,
             bias,
-            dilation,
             padding_mode)
 
         self.rank = rank
@@ -254,11 +254,11 @@ class LinearConv2DRankRatio(_LinearConv2D):
             in_channels,
             out_channels,
             kernel_size,
-            padding,
             stride,
+            padding,
+            dilation,
             groups,
             bias,
-            dilation,
             padding_mode)
 
         self.rank = rank
@@ -307,11 +307,11 @@ class LinearConv2DSparse(_LinearConv2D):
             in_channels,
             out_channels,
             kernel_size,
-            padding,
             stride,
+            padding,
+            dilation,
             groups,
             bias,
-            dilation,
             padding_mode,
         )
 
