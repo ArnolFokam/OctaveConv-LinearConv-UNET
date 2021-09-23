@@ -52,6 +52,22 @@ class _LinearConv2D(_ConvNd):
 
         nn.init.xavier_uniform_(self.conv_weights)
 
+    def _conv_forward(self, inputs, weight, bias):
+        if self.padding_mode != 'zeros':
+            return F.conv2d(F.pad(inputs, self._reversed_padding_repeated_twice, mode=self.padding_mode),
+                            weight, bias,
+                            stride=self.stride,
+                            padding=_pair(0),
+                            dilation=self.dilation,
+                            groups=self.groups)
+        return F.conv2d(inputs,
+                        weight,
+                        bias,
+                        stride=self.stride,
+                        padding=self.padding,
+                        dilation=self.dilation,
+                        groups=self.groups)
+
 
 class LinearConv2DSimple(_LinearConv2D):
     def __init__(self,
@@ -82,41 +98,25 @@ class LinearConv2DSimple(_LinearConv2D):
         nn.init.xavier_uniform_(self.conv_weights)
         self.linear_weights.data.uniform_(-0.1, 0.1)
 
-    def _conv_forward(self, inputs, weight, bias):
-        if self.padding_mode != 'zeros':
-            return F.conv2d(F.pad(inputs, self._reversed_padding_repeated_twice, mode=self.padding_mode),
-                            weight, bias,
-                            stride=self.stride,
-                            padding=_pair(0),
-                            dilation=self.dilation,
-                            groups=self.groups)
-        return F.conv2d(inputs,
-                        weight,
-                        bias,
-                        stride=self.stride,
-                        padding=self.padding,
-                        dilation=self.dilation,
-                        groups=self.groups)
-
     def forward(self, inputs):
         correlated_weights = torch.mm(self.linear_weights,
                                       self.conv_weights.reshape(self.out_channels // self.times, -1)) \
-            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size,
-                     self.kernel_size)
+            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size[0],
+                     self.kernel_size[0])
 
         return self._conv_forward(inputs,
                                   torch.cat((self.conv_weights, correlated_weights), dim=0),
                                   bias=self.bias)
 
     @staticmethod
-    def count_op_LinearConv2D(m, x, y):
+    def count_op(m, x, y):
         x = x[0]
 
         multiply_adds = 1
 
         cin = m.in_channels
         cout = m.out_channels
-        kh, kw = m.kernel_size, m.kernel_size
+        kh, kw = m.kernel_size[0], m.kernel_size[0]
         batch_size = x.size()[0]
 
         out_h = y.size(2)
@@ -184,41 +184,25 @@ class LinearConv2DLowRank(_LinearConv2D):
         self.column_weights.data.uniform_(-0.1, 0.1)
         self.row_weights.data.uniform_(-0.1, 0.1)
 
-    def _conv_forward(self, inputs, weight, bias):
-        if self.padding_mode != 'zeros':
-            return F.conv2d(F.pad(inputs, self._reversed_padding_repeated_twice, mode=self.padding_mode),
-                            weight, bias,
-                            stride=self.stride,
-                            padding=_pair(0),
-                            dilation=self.dilation,
-                            groups=self.groups)
-        return F.conv2d(inputs,
-                        weight,
-                        bias,
-                        stride=self.stride,
-                        padding=self.padding,
-                        dilation=self.dilation,
-                        groups=self.groups)
-
     def forward(self, inputs):
         correlated_weights = torch.mm(self.column_weights, torch.mm(self.row_weights, self.conv_weights.reshape(
             self.out_channels // self.times, -1))) \
-            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size,
-                     self.kernel_size)
+            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size[0],
+                     self.kernel_size[0])
 
         return self._conv_forward(inputs,
                                   torch.cat((self.conv_weights, correlated_weights), dim=0),
                                   bias=self.bias)
 
     @staticmethod
-    def count_op_LinearConv2Dlow(m, x, y):
+    def count_flops(m, x, y):
         x = x[0]
 
         multiply_adds = 1
 
         cin = m.in_channels
         cout = m.out_channels
-        kh, kw = m.kernel_size, m.kernel_size
+        kh, kw = m.kernel_size[0], m.kernel_size[0]
         batch_size = x.size()[0]
 
         out_h = y.size(2)
@@ -292,27 +276,11 @@ class LinearConv2DRankRatio(_LinearConv2D):
         self.column_weights.data.uniform_(-0.1, 0.1)
         self.row_weights.data.uniform_(-0.1, 0.1)
 
-    def _conv_forward(self, inputs, weight, bias):
-        if self.padding_mode != 'zeros':
-            return F.conv2d(F.pad(inputs, self._reversed_padding_repeated_twice, mode=self.padding_mode),
-                            weight, bias,
-                            stride=self.stride,
-                            padding=_pair(0),
-                            dilation=self.dilation,
-                            groups=self.groups)
-        return F.conv2d(inputs,
-                        weight,
-                        bias,
-                        stride=self.stride,
-                        padding=self.padding,
-                        dilation=self.dilation,
-                        groups=self.groups)
-
     def forward(self, inputs):
         correlated_weights = torch.mm(self.column_weights, torch.mm(self.row_weights, self.conv_weights.reshape(
             self.out_channels // self.times, -1))) \
-            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size,
-                     self.kernel_size)
+            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size[0],
+                     self.kernel_size[0])
 
         return self._conv_forward(inputs,
                                   torch.cat((self.conv_weights, correlated_weights), dim=0),
@@ -361,22 +329,6 @@ class LinearConv2DSparse(_LinearConv2D):
         self.mask.requires_grad = False
         self.percentile = 1. - float(torch.sum(self.mask).item()) / (self.mask.shape[0] ** 2)
 
-    def _conv_forward(self, inputs, weight, bias):
-        if self.padding_mode != 'zeros':
-            return F.conv2d(F.pad(inputs, self._reversed_padding_repeated_twice, mode=self.padding_mode),
-                            weight, bias,
-                            stride=self.stride,
-                            padding=_pair(0),
-                            dilation=self.dilation,
-                            groups=self.groups)
-        return F.conv2d(inputs,
-                        weight,
-                        bias,
-                        stride=self.stride,
-                        padding=self.padding,
-                        dilation=self.dilation,
-                        groups=self.groups)
-
     def forward(self, inputs):
 
         self.counter += 1
@@ -390,8 +342,8 @@ class LinearConv2DSparse(_LinearConv2D):
         self.mask = nn.Parameter(self.mask.type(torch.FloatTensor).to(self.device), requires_grad=False)
         temp = self.linear_weights * self.mask
         correlated_weights = torch.mm(temp, self.conv_weights.reshape(self.out_channels // self.times, -1)) \
-            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size,
-                     self.kernel_size)
+            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size[0],
+                     self.kernel_size[0])
 
         return self._conv_forward(inputs,
                                   torch.cat((self.conv_weights, correlated_weights), dim=0),
