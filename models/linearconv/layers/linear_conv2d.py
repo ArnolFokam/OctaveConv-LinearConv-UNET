@@ -72,6 +72,7 @@ class LinearConv2D(_ConvNd):
                         groups=self.groups)
 
     def forward(self, inputs):
+        print(self.kernel_size)
         correlated_weights = torch.mm(self.linear_weights,
                                       self.conv_weights.reshape(self.out_channels // self.times, -1)) \
             .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size,
