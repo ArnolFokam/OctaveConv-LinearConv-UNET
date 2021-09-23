@@ -48,7 +48,7 @@ class _LinearConv2D(_ConvNd):
             self.bias.data.uniform_(-0.1, 0.1)
 
         self.conv_weights = nn.Parameter(
-            torch.Tensor(out_channels // self.times, in_channels, kernel_size, kernel_size))
+            torch.Tensor(out_channels // self.times, in_channels, self.kernel_size_int, self.kernel_size_int))
 
         nn.init.xavier_uniform_(self.conv_weights)
 
