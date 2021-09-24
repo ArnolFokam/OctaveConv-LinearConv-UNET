@@ -143,7 +143,7 @@ class OctaveUNet(UNetBackBone):
                                    out_channels=self.channels[-1],
                                    in_alpha=alphas[1],
                                    out_alpha=alphas[-1],
-                                   batch_norm=self.batch_norm,
+                                   batch_norm=None,
                                    dropout=self.dropout,
                                    act_fn=None,
                                    spatial_ratio=2,
