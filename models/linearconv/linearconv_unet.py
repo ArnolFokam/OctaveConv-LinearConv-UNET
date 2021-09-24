@@ -39,6 +39,7 @@ class LinearConvUNet(UNetBackBone):
 
         decoder_input_channels = self.channels[-2:0:-1]
         decoder_output_channels = self.channels[-3:0:-1] + self.channels[1:2]
+        decoder_variants = variants[-2:0:-1]
 
         self.add_module("encoder_0",
                         DoubleLinearConvBlock(in_channels=self.channels[0],
@@ -80,8 +81,10 @@ class LinearConvUNet(UNetBackBone):
                                          variant=variant))
 
         i = len(decoder_input_channels)
-        for input_channel, output_channel in zip(
-                decoder_input_channels, decoder_output_channels):
+        for input_channel, output_channel, variant in zip(
+                decoder_input_channels,
+                decoder_output_channels,
+                decoder_variants):
             self.add_module('decoder_{}'.format(i),
                             DecoderBlock(in_channels=input_channel,
                                          mid_channels=output_channel,
@@ -98,7 +101,8 @@ class LinearConvUNet(UNetBackBone):
                                          dilation=self.dilation,
                                          groups=self.groups,
                                          bias=self.bias,
-                                         padding_mode=self.padding_mode))
+                                         padding_mode=self.padding_mode,
+                                         variant=variant))
             i -= 1
 
         self.add_module('decoder_0',
@@ -113,7 +117,8 @@ class LinearConvUNet(UNetBackBone):
                                         dilation=self.dilation,
                                         groups=self.groups,
                                         bias=self.bias,
-                                        padding_mode=self.padding_mode))
+                                        padding_mode=self.padding_mode,
+                                        variant=variants[-1]))
 
     def forward(self, inputs):
 
