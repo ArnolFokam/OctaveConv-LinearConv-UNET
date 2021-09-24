@@ -98,7 +98,7 @@ class BaselineUNet(UNetBackBone):
         self.add_module('decoder_0',
                         ConvBlock(in_channels=self.channels[1],
                                   out_channels=self.channels[-1],
-                                  batch_norm=self.batch_norm,
+                                  batch_norm=None,
                                   dropout=self.dropout,
                                   act_fn=None,
                                   kernel_size=1,
