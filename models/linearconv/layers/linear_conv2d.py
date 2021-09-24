@@ -6,43 +6,7 @@ from torch.nn.modules.conv import _ConvTransposeNd, _ConvNd
 from torch.nn.modules.utils import _pair
 
 
-class GenericConv(object):
-    def __init__(self,
-                 in_channels,
-                 out_channels,
-                 kernel_size=3,
-                 stride=1,
-                 padding=1,
-                 dilation=1,
-                 groups=1,
-                 bias=True,
-                 padding_mode='zeros',
-                 output_padding=0,
-                 use_transpose_conv=False):
-
-        kernel_size = _pair(kernel_size)
-        stride = _pair(stride)
-        padding = _pair(padding)
-        dilation = _pair(dilation)
-        output_padding = _pair(output_padding)
-
-        self.instance = _ConvTransposeNd(
-            in_channels, out_channels, kernel_size, stride, padding, dilation,
-            True, output_padding, groups, bias, padding_mode
-        ) if use_transpose_conv else _ConvNd(
-            in_channels, out_channels, kernel_size, stride, padding,
-            dilation, False, _pair(0), groups, bias, padding_mode)
-
-        # we don't need pytorch generated
-        # weights from _ConvNd since we
-        # initialize our own weights
-        del self.instance.weight
-
-    def __getattr__(self, name):
-        return self.instance.__getattribute__(name)
-
-
-class _LinearConv2D(GenericConv):
+class _LinearConv2D(_ConvTransposeNd, _ConvNd):
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -57,18 +21,24 @@ class _LinearConv2D(GenericConv):
                  use_transpose_conv=False):
         self.kernel_size_int = kernel_size
 
+        kernel_size = _pair(kernel_size)
+        stride = _pair(stride)
+        padding = _pair(padding)
+        dilation = _pair(dilation)
+        output_padding = _pair(output_padding)
+
         super(_LinearConv2D, self).__init__(
-            in_channels,
-            out_channels,
-            kernel_size,
-            stride,
-            padding,
-            dilation,
-            groups,
-            bias,
-            padding_mode,
-            output_padding,
-            use_transpose_conv)
+            in_channels=in_channels,
+            out_channels=out_channels,
+            kernel_size=kernel_size,
+            stride=stride,
+            padding=padding,
+            dilation=dilation,
+            output_padding=output_padding,
+            groups=groups,
+            bias=bias,
+            padding_mode=padding_mode,
+            transposed=False)
 
         self.times = 2  # ratio 1/2
 
