@@ -39,10 +39,9 @@ class GenericConv(object):
             dilation, False, _pair(0), groups, bias, padding_mode)
 
     def __getattr__(self, name):
-        if self.instance.__getattribute__(name) is None:
+        if self[name] is None:
             return self.instance.__getattribute__(name)
-        else:
-            return self[name]
+        return self[name]
 
 
 class _LinearConv2D(GenericConv):
