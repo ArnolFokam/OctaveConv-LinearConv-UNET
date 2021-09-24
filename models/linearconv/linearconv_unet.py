@@ -117,8 +117,7 @@ class LinearConvUNet(UNetBackBone):
                                         dilation=self.dilation,
                                         groups=self.groups,
                                         bias=self.bias,
-                                        padding_mode=self.padding_mode,
-                                        variant=variants[-1]))
+                                        padding_mode=self.padding_mode))
 
     def forward(self, inputs):
 
