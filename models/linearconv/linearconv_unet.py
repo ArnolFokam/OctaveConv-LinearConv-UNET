@@ -117,7 +117,6 @@ class LinearConvUNet(UNetBackBone):
     def forward(self, inputs):
 
         for name, module in self.named_children():
-            print(module.__class__)
             if name == 'encoder_0':
                 locals()[name] = module(inputs)
 

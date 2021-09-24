@@ -36,6 +36,8 @@ class LinearConvBlock(nn.Module):
         if variant is not None and variant not in possible_variants:
             raise ValueError('variants can only be {}'.format(possible_variants))
 
+        print(use_transpose_conv)
+
         if variant == 'linear_simple':
             self.conv = LinearConv2DSimple(in_channels,
                                            out_channels,

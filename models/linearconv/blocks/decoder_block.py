@@ -42,7 +42,9 @@ class DecoderBlock(nn.Module):
                 padding=padding,
                 output_padding=output_padding,
                 groups=groups,
-                bias=bias, padding_mode=padding_mode,
+                bias=bias,
+                padding_mode=padding_mode,
+                dilation=dilation,
                 variant=variant,
                 rank=rank,
                 prune_step=prune_step,
@@ -51,7 +53,6 @@ class DecoderBlock(nn.Module):
 
                 # most important
                 use_transpose_conv=True)
-
         elif upsample in ('bilinear', 'nearest'):
             self.upsample = nn.Upsample(
                 scale_factor=scale_factor,
