@@ -32,7 +32,7 @@ class GenericConv(object):
             in_channels, out_channels, kernel_size, stride, padding,
             dilation, False, _pair(0), groups, bias, padding_mode)
 
-        self.conv_func = F.conv_transpose2d if not self.use_transpose_conv else F.conv2d
+        self.conv_func = F.conv_transpose2d if not use_transpose_conv else F.conv2d
 
     def __getattr__(self, name):
         return self.instance.__getattribute__(name)
