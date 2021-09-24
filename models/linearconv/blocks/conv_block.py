@@ -23,9 +23,7 @@ class LinearConvBlock(nn.Module):
                  rank=1,
                  prune_step=500,
                  req_percentile=0.25,
-                 thresh_step=0.00001,
-                 output_padding=0,
-                 use_transpose_conv=False):
+                 thresh_step=0.00001):
         super(LinearConvBlock, self).__init__()
 
         possible_variants = ['linear_simple',
@@ -45,9 +43,7 @@ class LinearConvBlock(nn.Module):
                                            dilation=dilation,
                                            groups=groups,
                                            bias=bias,
-                                           padding_mode=padding_mode,
-                                           output_padding=output_padding,
-                                           use_transpose_conv=use_transpose_conv)
+                                           padding_mode=padding_mode)
 
         elif variant == 'linear_lowrank':
             self.conv = LinearConv2DLowRank(in_channels,
@@ -59,9 +55,7 @@ class LinearConvBlock(nn.Module):
                                             groups=groups,
                                             bias=bias,
                                             padding_mode=padding_mode,
-                                            rank=rank,
-                                            output_padding=output_padding,
-                                            use_transpose_conv=use_transpose_conv)
+                                            rank=rank)
 
         elif variant == 'linear_rankratio':
             self.conv = LinearConv2DLowRank(in_channels,
@@ -73,9 +67,7 @@ class LinearConvBlock(nn.Module):
                                             groups=groups,
                                             bias=bias,
                                             padding_mode=padding_mode,
-                                            rank=rank,
-                                            output_padding=output_padding,
-                                            use_transpose_conv=use_transpose_conv)
+                                            rank=rank)
 
         elif variant == 'linear_sparse':
             self.conv = LinearConv2DSparse(in_channels,
@@ -89,9 +81,7 @@ class LinearConvBlock(nn.Module):
                                            padding_mode=padding_mode,
                                            prune_step=prune_step,
                                            req_percentile=req_percentile,
-                                           thresh_step=thresh_step,
-                                           output_padding=output_padding,
-                                           use_transpose_conv=use_transpose_conv)
+                                           thresh_step=thresh_step)
 
         else:
             self.conv = nn.Conv2d(in_channels,

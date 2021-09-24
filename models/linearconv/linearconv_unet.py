@@ -19,7 +19,8 @@ class LinearConvUNet(UNetBackBone):
                  bias=True,
                  batch_norm=True,
                  dropout=False,
-                 padding_mode='zeros',):
+                 padding_mode='zeros',
+                 ):
         super(LinearConvUNet, self).__init__(
             channels,
             kernel_size,
