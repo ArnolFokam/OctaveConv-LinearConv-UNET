@@ -39,7 +39,6 @@ class GenericConv(object):
         del self.instance.weight
 
     def __getattr__(self, name):
-        print(self.instance.__class__.name, name)
         return self.instance.__getattribute__(name)
 
 
