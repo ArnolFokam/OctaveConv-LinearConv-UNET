@@ -1,6 +1,8 @@
 from torch import nn
 
 from models.linearconv.layers.linear_conv2d import LinearConv2DSimple, LinearConv2DSparse, LinearConv2DLowRank
+from models.linearconv.layers.linear_transpose_conv2d import LinearTransposeConv2DLowRank, LinearTransposeConv2DSparse, \
+    LinearTransposeConv2DRankRatio, LinearTransposeConv2DSimple
 
 
 class LinearConvBlock(nn.Module):
@@ -126,6 +128,106 @@ class LinearConvBlock(nn.Module):
         if self.dropout is not None:
             x = self.dropout(x)
 
+        return x
+
+
+class LinearTransposeConvBlock(nn.Module):
+    """Convolution with batch norm, activation, and dropout."""
+
+    def __init__(self,
+                 in_channels,
+                 out_channels,
+                 kernel_size=3,
+                 stride=1,
+                 padding=1,
+                 dilation=1,
+                 groups=1,
+                 bias=True,
+                 padding_mode='zeros',
+                 output_padding=0,
+                 variant=None,
+                 rank=1,
+                 prune_step=500,
+                 req_percentile=0.25,
+                 thresh_step=0.00001):
+        super(LinearTransposeConvBlock, self).__init__()
+
+        possible_variants = ['linear_simple',
+                             'linear_lowrank',
+                             'linear_rankratio',
+                             'linear_sparse']
+
+        if variant is not None and variant not in possible_variants:
+            raise ValueError('variants can only be {}'.format(possible_variants))
+
+        if variant == 'linear_simple':
+            self.conv = LinearTransposeConv2DSimple(in_channels,
+                                                    out_channels,
+                                                    kernel_size=kernel_size,
+                                                    stride=stride,
+                                                    padding=padding,
+                                                    dilation=dilation,
+                                                    groups=groups,
+                                                    bias=bias,
+                                                    padding_mode=padding_mode,
+                                                    output_padding=output_padding)
+
+        elif variant == 'linear_lowrank':
+            self.conv = LinearTransposeConv2DLowRank(in_channels,
+                                                     out_channels,
+                                                     kernel_size=kernel_size,
+                                                     stride=stride,
+                                                     padding=padding,
+                                                     dilation=dilation,
+                                                     groups=groups,
+                                                     bias=bias,
+                                                     padding_mode=padding_mode,
+                                                     rank=rank,
+                                                     output_padding=output_padding)
+
+        elif variant == 'linear_rankratio':
+            self.conv = LinearTransposeConv2DRankRatio(in_channels,
+                                                       out_channels,
+                                                       kernel_size=kernel_size,
+                                                       stride=stride,
+                                                       padding=padding,
+                                                       dilation=dilation,
+                                                       groups=groups,
+                                                       bias=bias,
+                                                       padding_mode=padding_mode,
+                                                       rank=rank,
+                                                       output_padding=output_padding)
+
+        elif variant == 'linear_sparse':
+            self.conv = LinearTransposeConv2DSparse(in_channels,
+                                                    out_channels,
+                                                    kernel_size=kernel_size,
+                                                    stride=stride,
+                                                    padding=padding,
+                                                    dilation=dilation,
+                                                    groups=groups,
+                                                    bias=bias,
+                                                    padding_mode=padding_mode,
+                                                    prune_step=prune_step,
+                                                    req_percentile=req_percentile,
+                                                    thresh_step=thresh_step,
+                                                    output_padding=output_padding)
+
+        else:
+            self.conv = nn.ConvTranspose2d(in_channels,
+                                           out_channels,
+                                           kernel_size=kernel_size,
+                                           stride=stride,
+                                           padding=padding,
+                                           output_padding=output_padding,
+                                           groups=groups,
+                                           bias=bias,
+                                           dilation=dilation,
+                                           padding_mode=padding_mode)
+
+    # pylint: disable=arguments-differ
+    def forward(self, x):
+        x = self.conv(x)
         return x
 
 
