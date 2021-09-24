@@ -50,7 +50,7 @@ class _LinearConv2D(_ConvTransposeNd, _ConvNd):
             torch.Tensor(out_channels // self.times, in_channels, self.kernel_size_int, self.kernel_size_int))
 
         nn.init.xavier_uniform_(self.conv_weights)
-        self.conv_func = F.conv_transpose2d if not use_transpose_conv else F.conv2d
+        self.conv_func = F.conv_transpose2d if use_transpose_conv else F.conv2d
 
     def _conv_forward(self, inputs, weight, bias):
 
