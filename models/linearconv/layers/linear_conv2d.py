@@ -19,11 +19,14 @@ class GenericConv(object):
                  padding_mode='zeros',
                  output_padding=0,
                  use_transpose_conv=False):
+
         kernel_size = _pair(kernel_size)
         stride = _pair(stride)
         padding = _pair(padding)
         dilation = _pair(dilation)
         output_padding = _pair(output_padding)
+
+        print(use_transpose_conv)
 
         self.conv_func = F.conv_transpose2d if not use_transpose_conv else F.conv2d
 
