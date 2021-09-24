@@ -33,6 +33,11 @@ class GenericConv(object):
             in_channels, out_channels, kernel_size, stride, padding,
             dilation, False, _pair(0), groups, bias, padding_mode)
 
+        # we don't need pytorch generated
+        # weights from _ConvNd since we
+        # initialize our own weights
+        del self.instance.weight
+
     def __getattr__(self, name):
         return self.instance.__getattribute__(name)
 
@@ -66,11 +71,6 @@ class _LinearConv2D(GenericConv):
             use_transpose_conv)
 
         self.times = 2  # ratio 1/2
-
-        # we don't need pytorch generated
-        # weights from _ConvNd since we
-        # initialize our own weights
-        del self.weight
 
         if bias:
             self.bias = nn.Parameter(torch.Tensor(out_channels))
