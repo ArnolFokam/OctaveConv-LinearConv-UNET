@@ -26,10 +26,11 @@ class GenericConv(object):
         dilation = _pair(dilation)
         output_padding = _pair(output_padding)
 
-        print(use_transpose_conv)
+        # hack to support conditional inheritance
+        _ConvNd.transpose_conv = use_transpose_conv
+        _ConvTransposeNd.transpose_conv = use_transpose_conv
 
         self.conv_func = F.conv_transpose2d if not use_transpose_conv else F.conv2d
-
         self.instance = _ConvTransposeNd(
             in_channels, out_channels, kernel_size, stride, padding, dilation,
             True, output_padding, groups, bias, padding_mode
@@ -38,7 +39,10 @@ class GenericConv(object):
             dilation, False, _pair(0), groups, bias, padding_mode)
 
     def __getattr__(self, name):
-        return self.instance.__getattribute__(name)
+        if self.instance.__getattribute__(name) is None:
+            return self.instance.__getattribute__(name)
+        else:
+            return self[name]
 
 
 class _LinearConv2D(GenericConv):
