@@ -25,14 +25,14 @@ class GenericConv(object):
         dilation = _pair(dilation)
         output_padding = _pair(output_padding)
 
+        self.conv_func = F.conv_transpose2d if not use_transpose_conv else F.conv2d
+
         self.instance = _ConvTransposeNd(
             in_channels, out_channels, kernel_size, stride, padding, dilation,
             True, output_padding, groups, bias, padding_mode
         ) if use_transpose_conv else _ConvNd(
             in_channels, out_channels, kernel_size, stride, padding,
             dilation, False, _pair(0), groups, bias, padding_mode)
-
-        self.conv_func = F.conv_transpose2d if not use_transpose_conv else F.conv2d
 
     def __getattr__(self, name):
         return self.instance.__getattribute__(name)
