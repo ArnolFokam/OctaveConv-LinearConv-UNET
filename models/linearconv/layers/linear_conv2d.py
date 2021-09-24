@@ -50,24 +50,38 @@ class _LinearConv2D(_ConvTransposeNd, _ConvNd):
             torch.Tensor(out_channels // self.times, in_channels, self.kernel_size_int, self.kernel_size_int))
 
         nn.init.xavier_uniform_(self.conv_weights)
+        self.use_transpose_conv = use_transpose_conv
         self.conv_func = F.conv_transpose2d if use_transpose_conv else F.conv2d
 
-    def _conv_forward(self, inputs, weight, bias):
+    def _conv_forward(self, inputs, weight, bias, output_size=None):
+
+        output_padding = None
+
+        if self.use_transpose_conv:
+            output_padding = self._output_padding(
+                inputs, output_size,
+                stride=self.stride,
+                padding=self.padding,
+                kernel_size=self.kernel_size,
+                dilation=self.dilation)
 
         if self.padding_mode != 'zeros':
+
             return self.conv_func(F.pad(inputs, self._reversed_padding_repeated_twice, mode=self.padding_mode),
                                   weight, bias,
                                   stride=self.stride,
                                   padding=_pair(0),
                                   dilation=self.dilation,
-                                  groups=self.groups)
+                                  groups=self.groups,
+                                  output_padding=output_padding)
         return self.conv_func(inputs,
                               weight,
                               bias,
                               stride=self.stride,
                               padding=self.padding,
                               dilation=self.dilation,
-                              groups=self.groups)
+                              groups=self.groups,
+                              output_padding=output_padding)
 
 
 class LinearConv2DSimple(_LinearConv2D):
