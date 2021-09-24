@@ -2,11 +2,11 @@ import torch
 from torch import nn
 import torch.nn.functional as F
 
-from torch.nn.modules.conv import _ConvNd
+from torch.nn.modules.conv import _ConvTransposeNd, _ConvNd
 from torch.nn.modules.utils import _pair
 
 
-class _LinearConv2D(_ConvNd):
+class GenericConv(object):
     def __init__(self,
                  in_channels,
                  out_channels,
@@ -16,25 +16,55 @@ class _LinearConv2D(_ConvNd):
                  dilation=1,
                  groups=1,
                  bias=True,
-                 padding_mode='zeros'):
+                 padding_mode='zeros',
+                 output_padding=0,
+                 use_transpose_conv=False):
+        kernel_size = _pair(kernel_size)
+        stride = _pair(stride)
+        padding = _pair(padding)
+        dilation = _pair(dilation)
+        output_padding = _pair(output_padding)
+
+        self.instance = _ConvTransposeNd(
+            in_channels, out_channels, kernel_size, stride, padding, dilation,
+            True, output_padding, groups, bias, padding_mode
+        ) if use_transpose_conv else _ConvNd(
+            in_channels, out_channels, kernel_size, stride, padding,
+            dilation, False, _pair(0), groups, bias, padding_mode)
+
+        self.conv_func = F.conv_transpose2d if not self.use_transpose_conv else F.conv2d
+
+    def __getattr__(self, name):
+        return self.instance.__getattribute__(name)
+
+
+class _LinearConv2D(GenericConv):
+    def __init__(self,
+                 in_channels,
+                 out_channels,
+                 kernel_size=3,
+                 stride=1,
+                 padding=1,
+                 dilation=1,
+                 groups=1,
+                 bias=True,
+                 padding_mode='zeros',
+                 output_padding=0,
+                 use_transpose_conv=False):
         self.kernel_size_int = kernel_size
-        kernel_size_ = _pair(kernel_size)
-        stride_ = _pair(stride)
-        padding_ = padding if isinstance(padding, str) else _pair(padding)
-        dilation_ = _pair(dilation)
 
         super(_LinearConv2D, self).__init__(
             in_channels,
             out_channels,
-            kernel_size_,
-            stride_,
-            padding_,
-            dilation_,
-            False,
-            _pair(0),
+            kernel_size,
+            stride,
+            padding,
+            dilation,
             groups,
             bias,
-            padding_mode)
+            padding_mode,
+            output_padding,
+            use_transpose_conv)
 
         self.times = 2  # ratio 1/2
 
@@ -53,20 +83,21 @@ class _LinearConv2D(_ConvNd):
         nn.init.xavier_uniform_(self.conv_weights)
 
     def _conv_forward(self, inputs, weight, bias):
+
         if self.padding_mode != 'zeros':
-            return F.conv2d(F.pad(inputs, self._reversed_padding_repeated_twice, mode=self.padding_mode),
-                            weight, bias,
-                            stride=self.stride,
-                            padding=_pair(0),
-                            dilation=self.dilation,
-                            groups=self.groups)
-        return F.conv2d(inputs,
-                        weight,
-                        bias,
-                        stride=self.stride,
-                        padding=self.padding,
-                        dilation=self.dilation,
-                        groups=self.groups)
+            return self.conv_func(F.pad(inputs, self._reversed_padding_repeated_twice, mode=self.padding_mode),
+                                  weight, bias,
+                                  stride=self.stride,
+                                  padding=_pair(0),
+                                  dilation=self.dilation,
+                                  groups=self.groups)
+        return self.conv_func(inputs,
+                              weight,
+                              bias,
+                              stride=self.stride,
+                              padding=self.padding,
+                              dilation=self.dilation,
+                              groups=self.groups)
 
 
 class LinearConv2DSimple(_LinearConv2D):
@@ -79,8 +110,9 @@ class LinearConv2DSimple(_LinearConv2D):
                  groups=1,
                  bias=True,
                  dilation=1,
-                 padding_mode='zeros'):
-
+                 padding_mode='zeros',
+                 output_padding=0,
+                 use_transpose_conv=False):
         super(LinearConv2DSimple, self).__init__(
             in_channels,
             out_channels,
@@ -90,7 +122,9 @@ class LinearConv2DSimple(_LinearConv2D):
             dilation,
             groups,
             bias,
-            padding_mode)
+            padding_mode,
+            output_padding,
+            use_transpose_conv)
 
         self.linear_weights = nn.Parameter(
             torch.Tensor(out_channels - out_channels // self.times, out_channels // self.times))
@@ -157,8 +191,9 @@ class LinearConv2DLowRank(_LinearConv2D):
                  bias=True,
                  dilation=1,
                  padding_mode='zeros',
-                 rank=1):
-
+                 rank=1,
+                 output_padding=0,
+                 use_transpose_conv=False):
         super(LinearConv2DLowRank, self).__init__(
             in_channels,
             out_channels,
@@ -168,7 +203,10 @@ class LinearConv2DLowRank(_LinearConv2D):
             dilation,
             groups,
             bias,
-            padding_mode)
+            padding_mode,
+            output_padding,
+            use_transpose_conv
+        )
 
         self.rank = rank
 
@@ -247,8 +285,9 @@ class LinearConv2DRankRatio(_LinearConv2D):
                  bias=True,
                  dilation=1,
                  padding_mode='zeros',
-                 rank=1):
-
+                 rank=1,
+                 output_padding=0,
+                 use_transpose_conv=False):
         super(LinearConv2DRankRatio, self).__init__(
             in_channels,
             out_channels,
@@ -258,7 +297,9 @@ class LinearConv2DRankRatio(_LinearConv2D):
             dilation,
             groups,
             bias,
-            padding_mode)
+            padding_mode,
+            output_padding,
+            use_transpose_conv)
 
         self.rank = rank
 
@@ -301,7 +342,9 @@ class LinearConv2DSparse(_LinearConv2D):
                  req_percentile=0.25,
                  thresh_step=0.00001,
                  dilation=1,
-                 bias=True):
+                 bias=True,
+                 output_padding=0,
+                 use_transpose_conv=False):
         super(LinearConv2DSparse, self).__init__(
             in_channels,
             out_channels,
@@ -312,6 +355,8 @@ class LinearConv2DSparse(_LinearConv2D):
             groups,
             bias,
             padding_mode,
+            output_padding,
+            use_transpose_conv
         )
 
         self.prune_step = prune_step
@@ -330,7 +375,6 @@ class LinearConv2DSparse(_LinearConv2D):
         self.percentile = 1. - float(torch.sum(self.mask).item()) / (self.mask.shape[0] ** 2)
 
     def forward(self, inputs):
-
         self.counter += 1
         if self.counter == self.prune_step:
             self.counter = 0
