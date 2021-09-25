@@ -11,6 +11,7 @@ from agents.handlers.configs_handler import ConfigsHandler
 from agents.handlers.paths_handler import PathsHandler
 from agents.handlers.device_handler import DeviceHandler
 from agents.handlers.data_handler import DataHandler
+from models.utils.model_summary.model_summary import ModelSummary
 
 LOGGER = logging.getLogger(__name__)
 
