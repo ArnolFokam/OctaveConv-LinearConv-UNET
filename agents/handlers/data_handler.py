@@ -34,7 +34,7 @@ class DataHandler(PathsHandler, ConfigsHandler):
 
     def handle_data(self):
         """Get data loaders and sample keys."""
-        self.image_key, self.mask_key = self.get_sample_keys()
+        # self.image_key, self.mask_key = self.get_sample_keys()
         (self.train_loader, self.valid_loader,
          self.test_loader) = self.get_data_loaders()
 

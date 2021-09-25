@@ -2,25 +2,17 @@ AGENT:
   RESUME: true
   RUN_MODE: train
 DATA:
-  DATASET:
-    DATASET_DIR: "/storage/datasets/brain-lesion-seg/lgg-mri-segmentation/kaggle_3m"
-    WORKERS: 4
-    IMAGE_SIZE: 224
-    AUGMENTATION:
-      SCALE: 0.05
-      ANGLE: 15
-    DATASET_NAME: drive
-    DATA_TYPE: null
-    IMAGE_KEY: image
-    MASK_KEY: null
-    TARGET_KEY: target
-    TEST_IDS: null
-    VALID_IDS: null
-  DATA_ROOT: data
-  ENABLE_DROP_LAST: false
-  ENABLE_PIN_MEMORY: false
-  ENABLE_SHUFFLE: true
   BATCH_SIZE: 16
+  DATASET:
+    AUGMENTATION:
+      ANGLE: 15
+      SCALE: 0.05
+    DATASET_DIR: /storage/datasets/brain-lesion-seg/lgg-mri-segmentation/kaggle_3m
+    IMAGE_SIZE: 224
+    MASK_KEY: null
+    WORKERS: 4
+  # TODO: implement shuffle
+  ENABLE_SHUFFLE: true
 DEVICE:
   DEVICE_IDS: 3
   ENABLE_BENCHMARK: true
