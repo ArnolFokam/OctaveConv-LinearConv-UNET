@@ -2,7 +2,7 @@ import numpy as np
 
 from torch.utils.data import DataLoader
 
-from utils.helpers import transforms
+from processings.augmentation import transforms
 
 
 def data_loaders(Dataset, images_dir, batch_size=32, workers=2, image_size=0.5, aug_scale=0.5, aug_angle=0.5):
@@ -17,6 +17,13 @@ def data_loaders(Dataset, images_dir, batch_size=32, workers=2, image_size=0.5, 
     dataset_valid = Dataset(
         images_dir,
         subset="validation",
+        image_size=image_size,
+        random_sampling=False,
+    )
+
+    dataset_test = Dataset(
+        images_dir,
+        subset="test",
         image_size=image_size,
         random_sampling=False,
     )
@@ -40,4 +47,12 @@ def data_loaders(Dataset, images_dir, batch_size=32, workers=2, image_size=0.5, 
         worker_init_fn=worker_init,
     )
 
-    return loader_train, loader_valid
+    loader_test = DataLoader(
+        dataset_test,
+        batch_size=batch_size,
+        drop_last=False,
+        num_workers=workers,
+        worker_init_fn=worker_init,
+    )
+
+    return loader_train, loader_valid, loader_test
