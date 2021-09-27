@@ -7,9 +7,9 @@ from __future__ import print_function
 import collections
 import logging
 
-from src.metrics import binary_confusion
-from src.metrics import area_under_cruves
-from src.metrics import dice_coefficient
+from metrics import binary_confusion
+from metrics import area_under_curves
+from metrics import dice_coefficient
 
 
 LOGGER = logging.getLogger(__name__)
@@ -59,15 +59,15 @@ def get_metrics(metric_names, prob_maps, binary_maps, targets,
                 true_pos, false_pos, false_neg)
 
         elif metric == 'auroc':
-            metrics[metric] = area_under_cruves.get_area_under_roc_cruve(
+            metrics[metric] = area_under_curves.get_area_under_roc_cruve(
                 prob_maps, targets)
 
         elif metric == 'auprc':
-            metrics[metric] = area_under_cruves.get_area_under_pr_cruve(
+            metrics[metric] = area_under_curves.get_area_under_pr_cruve(
                 prob_maps, targets)
 
         elif metric == 'ap':
-            metrics[metric] = area_under_cruves.get_average_precision_score(
+            metrics[metric] = area_under_curves.get_average_precision_score(
                 prob_maps, targets)
 
         elif metric == 'dice':

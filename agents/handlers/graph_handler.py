@@ -11,7 +11,7 @@ from agents.handlers.configs_handler import ConfigsHandler
 from agents.handlers.paths_handler import PathsHandler
 from agents.handlers.device_handler import DeviceHandler
 from agents.handlers.data_handler import DataHandler
-from metrics.dice import DiceLoss
+from criterions.dice_loss import DiceLoss
 from models.utils.model_summary.model_summary import ModelSummary
 
 LOGGER = logging.getLogger(__name__)
@@ -167,5 +167,6 @@ class GraphHandler(DataHandler, DeviceHandler, PathsHandler, ConfigsHandler):
         return self.model
 
     def get_criterion(self) -> torch.nn.Module:
+        smooth = self.configs.LOSS.SMOOTHING
         """Get loss criterion."""
-        return DiceLoss()
+        return DiceLoss(smooth=smooth)
