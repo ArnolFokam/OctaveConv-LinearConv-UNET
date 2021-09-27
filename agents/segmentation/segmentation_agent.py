@@ -31,6 +31,18 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
         # initialize agent state of epoch count, step count, and monitors
         self.init_agent_state()
 
+        if self.configs.AGENT.RESUME is True:
+            # resume from latest modified ckpt
+            self.resume_agent_state()
+
+            # get summary writer after resumed
+        self.summ_writer = self.get_summ_writer()
+
+        # write computation graph
+        self.summ_writer.add_graph(
+            self.model, next(iter(self.train_loader))[0].to(
+                self.device))
+
     def get_model(self):
         """Get model."""
         return get_model(self.configs)
