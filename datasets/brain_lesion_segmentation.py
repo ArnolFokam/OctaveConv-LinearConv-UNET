@@ -23,6 +23,7 @@ class BrainLesionSegmentationDataset(Dataset):
             image_size=256,
             subset="train",
             random_sampling=True,
+            fraction=1.0,
             seed=42,
     ):
         assert subset in ["all", "train", "validation", "test"]
@@ -48,7 +49,7 @@ class BrainLesionSegmentationDataset(Dataset):
                 volumes[patient_id] = np.array(image_slices[1:-1])
                 masks[patient_id] = np.array(mask_slices[1:-1])
 
-        self.patients = sorted(volumes)
+        self.patients = sorted(volumes)[:int(fraction * len(volumes))]
 
         # select cases to subset
         if not subset == "all":

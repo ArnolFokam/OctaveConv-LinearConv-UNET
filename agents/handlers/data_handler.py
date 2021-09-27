@@ -63,9 +63,11 @@ class DataHandler(PathsHandler, ConfigsHandler):
         aug_scale = self.configs.DATA.DATASET.AUGMENTATION.SCALE
         aug_angle = self.configs.DATA.DATASET.AUGMENTATION.ANGLE
         dataset_dir = self.configs.DATA.DATASET.DATASET_DIR
+        fraction = self.configs.DATA.DATASET.FRACTION if self.configs.DATA.DATASET.FRACTION is not None else 1.0
 
         train, val, test = data_loaders(BrainLesionSegmentationDataset,
                                         dataset_dir,
+                                        fraction,
                                         batch_size,
                                         workers,
                                         image_size,

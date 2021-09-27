@@ -6,12 +6,13 @@ from torch.utils.data import DataLoader
 from processings.augmentation import transforms
 
 
-def data_loaders(Dataset, images_dir, batch_size=32, workers=2, image_size=0.5, aug_scale=0.5, aug_angle=0.5):
+def data_loaders(Dataset, images_dir, fraction=1.0, batch_size=32, workers=2, image_size=0.5, aug_scale=0.5, aug_angle=0.5):
 
     dataset = Dataset(
         images_dir,
         subset="train",
         image_size=image_size,
+        fraction=fraction,
         transform=transforms(scale=aug_scale, angle=aug_angle, flip_prob=0.5),
     )
 
