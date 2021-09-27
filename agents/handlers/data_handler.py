@@ -47,10 +47,9 @@ class DataHandler(PathsHandler, ConfigsHandler):
         return image_key, mask_key
 
     @staticmethod
-    def get_data_shape(data_loader: torch.utils.data.DataLoader,
-                       data_key: str) -> [int, int, int, int]:
+    def get_data_shape(data_loader: torch.utils.data.DataLoader) -> [int, int, int, int]:
         """Get data shape from data loader."""
-        data_shape = next(iter(data_loader))[data_key].shape
+        data_shape = next(iter(data_loader)).shape
         return data_shape
 
     def get_data_loaders(self) -> (torch.utils.data.DataLoader,

@@ -156,7 +156,7 @@ class GraphHandler(DataHandler, DeviceHandler, PathsHandler, ConfigsHandler):
 
     def get_model_summary(self, query_granularity: int = 1):
         """Record model summary."""
-        data_shape = self.get_data_shape(self.train_loader, self.image_key)[1:]
+        data_shape = self.get_data_shape(self.train_loader)[1:]
         model_summary = ModelSummary(self.model, data_shape, query_granularity)
         model_summary = model_summary.get_data_frame()
         return model_summary
