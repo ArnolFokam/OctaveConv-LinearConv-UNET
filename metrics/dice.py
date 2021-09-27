@@ -3,10 +3,10 @@ from torch import nn
 import torch.nn.functional as F
 
 
-class DiceLossOld(nn.Module):
+class DiceLoss(nn.Module):
 
     def __init__(self):
-        super(DiceLossOld, self).__init__()
+        super(DiceLoss, self).__init__()
         self.smooth = 1.0
 
     def forward(self, y_pred, y_true):
@@ -20,7 +20,7 @@ class DiceLossOld(nn.Module):
         return 1. - dsc
 
 
-class DiceLoss(nn.Module):
+class DiceLossNew(nn.Module):
     r"""Criterion that computes Sørensen-Dice Coefficient loss.
 
     According to [1], we compute the Sørensen-Dice Coefficient as follows:

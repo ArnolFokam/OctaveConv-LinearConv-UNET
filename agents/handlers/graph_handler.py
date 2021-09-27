@@ -11,6 +11,7 @@ from agents.handlers.configs_handler import ConfigsHandler
 from agents.handlers.paths_handler import PathsHandler
 from agents.handlers.device_handler import DeviceHandler
 from agents.handlers.data_handler import DataHandler
+from metrics.dice import DiceLoss
 from models.utils.model_summary.model_summary import ModelSummary
 
 LOGGER = logging.getLogger(__name__)
@@ -163,8 +164,8 @@ class GraphHandler(DataHandler, DeviceHandler, PathsHandler, ConfigsHandler):
 
     def get_model(self) -> torch.nn.Module:
         """Get model."""
-        raise NotImplementedError
+        raise self.model
 
     def get_criterion(self) -> torch.nn.Module:
         """Get loss criterion."""
-        raise NotImplementedError
+        raise DiceLoss()
