@@ -1,6 +1,7 @@
-from skimage.transform import rescale, rotate, resize
+from skimage.transform import rescale, rotate
 
 from torchvision.transforms import Compose
+import numpy as np
 
 
 class Scale(object):
