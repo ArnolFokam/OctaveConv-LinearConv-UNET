@@ -54,6 +54,10 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
             self.model, next(iter(self.train_loader))[0].to(
                 self.device))
 
+    def get_model(self):
+        """Get model."""
+        return get_model(self.configs)
+
     def run(self):
         """Running routine of agent."""
         run_mode = self.configs.AGENT.RUN_MODE
@@ -135,10 +139,6 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
 
             self.current_epoch += 1
 
-    def get_model(self):
-        """Get model."""
-        return get_model(self.configs)
-
     def step_training(self):
         """Run one step of training."""
         # init meters for loss value and metric values
@@ -160,16 +160,13 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
         self.model.train()
 
         for sample_batch in epoch_progress:
-            images = sample_batch[self.image_key].to(self.device)
-            targets = sample_batch[self.target_key].to(self.device)
-            masks = None if self.mask_key is None else sample_batch[
-                self.mask_key].to(self.device)
+            images, targets = sample_batch.to(self.device)
 
             # model outputs inactivated logits
             logits = self.model(images)
             prob_maps = torch.sigmoid(logits)
             binary_maps = self.get_binary_maps(prob_maps)
-            analytic_maps = self.get_analytic_maps(binary_maps, targets, masks)
+            analytic_maps = self.get_analytic_maps(binary_maps, targets)
 
             # criterion inputs inactivated logits
             current_loss = self.criterion(logits, targets)
@@ -189,7 +186,7 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
             # update meters
             loss_meter.accumulate(current_loss.item())
             current_metrics = self.get_metrics(
-                prob_maps, binary_maps, targets, masks)
+                prob_maps, binary_maps, targets)
             metric_meters.accumulate(current_metrics)
 
             # record visual summary
@@ -197,7 +194,7 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
                 self.write_figures('train', **{
                     'images': images,
                     'targets': targets,
-                    'masks': masks,
+                    # 'masks': masks,
                     'probability_maps': prob_maps,
                     'binary_maps': binary_maps,
                     'analytic_maps': analytic_maps,
@@ -237,16 +234,13 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
         self.model.eval()
         # epoch loop over dataset once
         for sample_batch in epoch_progress:
-            images = sample_batch[self.image_key].to(self.device)
-            targets = sample_batch[self.target_key].to(self.device)
-            masks = None if self.mask_key is None else sample_batch[
-                self.mask_key].to(self.device)
+            images, targets = sample_batch.to(self.device)
 
             # model outputs unactivated logits
             logits = self.model(images)
             prob_maps = torch.sigmoid(logits)
             binary_maps = self.get_binary_maps(prob_maps)
-            analytic_maps = self.get_analytic_maps(binary_maps, targets, masks)
+            analytic_maps = self.get_analytic_maps(binary_maps, targets)
 
             # criterion inputs unactivated logits
             current_loss = self.criterion(logits, targets)
@@ -261,7 +255,7 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
             # update meters
             loss_meter.accumulate(current_loss.item())
             current_metrics = self.get_metrics(
-                prob_maps, binary_maps, targets, masks)
+                prob_maps, binary_maps, targets)
             metric_meters.accumulate(current_metrics)
 
             # record visual summary
@@ -269,7 +263,7 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
                 self.write_figures('valid', **{
                     'images': images,
                     'targets': targets,
-                    'masks': masks,
+                    # 'masks': masks,
                     'probability_maps': prob_maps,
                     'binary_maps': binary_maps,
                     'analytic_maps': analytic_maps,
@@ -329,7 +323,7 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
     def get_metrics(self, prob_maps, binary_maps, targets, masks=None):
         """Get metrics values on a batch of probability maps and targets."""
         metric_names = self.configs.METRICS.METRIC_NAMES
-        return get_metrics(metric_names, prob_maps, binary_maps, targets, masks)
+        return get_metrics(metric_names, prob_maps, binary_maps, targets)
 
     @staticmethod
     def get_analytic_maps(binary_maps, targets, masks=None):
@@ -398,16 +392,13 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
             # sample_id is the index according to the dataset
             sample_id = self.test_loader.dataset.dataset.indices[idx]
 
-            images = sample_batch[self.image_key].to(self.device)
-            targets = sample_batch[self.target_key].to(self.device)
-            masks = None if self.mask_key is None else sample_batch[
-                self.mask_key].to(self.device)
+            images, targets = sample_batch.to(self.device)
 
             # model outputs inactivated logits
             logits = self.model(images)
             prob_maps = torch.sigmoid(logits)
             binary_maps = self.get_binary_maps(prob_maps)
-            analytic_maps = self.get_analytic_maps(binary_maps, targets, masks)
+            analytic_maps = self.get_analytic_maps(binary_maps, targets)
 
             # criterion inputs inactivated logits
             current_loss = self.criterion(logits, targets)
@@ -421,13 +412,13 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
             # update meters
             loss_meter.accumulate(current_loss.item())
             current_metrics = self.get_metrics(
-                prob_maps, binary_maps, targets, masks)
+                prob_maps, binary_maps, targets)
             metric_meters.accumulate(current_metrics)
 
             self.save_figures(output_dir, sample_id, **{
                 'images': images,
                 'targets': targets,
-                'masks': masks,
+                # 'masks': masks,
                 'probability_maps': prob_maps,
                 'binary_maps': binary_maps,
                 'analytic_maps': analytic_maps,

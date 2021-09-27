@@ -22,11 +22,6 @@ class DataHandler(PathsHandler, ConfigsHandler):
         # init configs
         super(DataHandler, self).__init__(external_configs_list)
 
-        # init sample keys
-        self.image_key = None
-        self.target_key = None
-        self.mask_key = None
-
         # data loaders
         self.train_loader = None
         self.valid_loader = None
@@ -37,14 +32,6 @@ class DataHandler(PathsHandler, ConfigsHandler):
         # self.image_key, self.mask_key = self.get_sample_keys()
         (self.train_loader, self.valid_loader,
          self.test_loader) = self.get_data_loaders()
-
-    def get_sample_keys(self) -> (str, str, str):
-        """Get sample keys for reading data of image, target, and mask."""
-        # get keys of data sample
-        image_key = self.configs.DATA.DATASET.IMAGE_KEY
-        mask_key = self.configs.DATA.DATASET.MASK_KEY
-
-        return image_key, mask_key
 
     @staticmethod
     def get_data_shape(data_loader: torch.utils.data.DataLoader) -> [int, int, int, int]:
