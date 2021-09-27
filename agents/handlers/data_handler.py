@@ -6,6 +6,7 @@ from __future__ import print_function
 
 import logging
 import torch
+import numpy as np
 
 from agents.handlers.configs_handler import ConfigsHandler
 from agents.handlers.paths_handler import PathsHandler
@@ -49,7 +50,7 @@ class DataHandler(PathsHandler, ConfigsHandler):
     @staticmethod
     def get_data_shape(data_loader: torch.utils.data.DataLoader) -> [int, int, int, int]:
         """Get data shape from data loader."""
-        data_shape = next(iter(data_loader)).shape
+        data_shape = np.array(next(iter(data_loader))).shape
         return data_shape
 
     def get_data_loaders(self) -> (torch.utils.data.DataLoader,
