@@ -164,8 +164,8 @@ class GraphHandler(DataHandler, DeviceHandler, PathsHandler, ConfigsHandler):
 
     def get_model(self) -> torch.nn.Module:
         """Get model."""
-        raise self.model
+        return self.model
 
     def get_criterion(self) -> torch.nn.Module:
         """Get loss criterion."""
-        raise DiceLoss()
+        return DiceLoss()
