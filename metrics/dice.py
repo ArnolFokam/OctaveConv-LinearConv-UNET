@@ -5,9 +5,9 @@ import torch.nn.functional as F
 
 class DiceLoss(nn.Module):
 
-    def __init__(self):
+    def __init__(self, smooth=1.0):
         super(DiceLoss, self).__init__()
-        self.smooth = 1.0
+        self.smooth = smooth
 
     def forward(self, y_pred, y_true):
         assert y_pred.size() == y_true.size()

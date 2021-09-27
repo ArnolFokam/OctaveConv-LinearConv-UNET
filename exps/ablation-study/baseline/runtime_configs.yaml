@@ -27,10 +27,8 @@ LOCAL:
   OUT_SUBDIR: outs
   SUMM_SUBDIR: summs
 LOSS:
-  FOCAL_ALPHA: null
-  FOCAL_GAMMA: null
-  LOSS_NAME: weighted_binary_cross_entropy
-  POS_WEIGHT_FACTOR: 0.1
+  SMOOTHING: 1.0
+  LOSS_NAME: dice_loss
 METRICS:
   METRIC_NAMES:
   - acc
@@ -40,6 +38,7 @@ METRICS:
   - prc
   - auroc
   - ap
+  - dsc
   MONITOR_NAMES: null
   THRESHOLD:
     BLOCK_SIZE: null

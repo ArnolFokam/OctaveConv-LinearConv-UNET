@@ -25,6 +25,12 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
         # get model, criterion, optimizer, and lr_scheduler
         self.handle_computation_graph()
 
+        # save model summary
+        self.save_model_summary()
+
+        # initialize agent state of epoch count, step count, and monitors
+        self.init_agent_state()
+
     def get_model(self):
         """Get model."""
         return get_model(self.configs)
