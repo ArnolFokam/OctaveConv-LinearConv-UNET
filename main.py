@@ -57,6 +57,7 @@ def main():
 
     # add get_agents when multiple agents are available
     agent = SegmentationAgent()
+    agent.run()
 
 
 if __name__ == '__main__':
