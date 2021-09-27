@@ -17,7 +17,7 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
         self.handle_paths()
 
         # get sample keys and data loaders
-        # self.handle_data()
+        self.handle_data()
 
         # get device and setup random seed and benchmark
         self.handle_device()
