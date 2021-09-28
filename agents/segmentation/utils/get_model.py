@@ -18,7 +18,6 @@ LOGGER = logging.getLogger(__name__)
 def get_model(configs: ConfigNode):
     """Get model."""
     model_name = configs.MODEL.MODEL_NAME
-    print(configs.MODEL.VARIANTS)
     if model_name == 'octave':
         kwargs = {
             'channels': configs.MODEL.CHANNELS,
@@ -50,7 +49,6 @@ def get_model(configs: ConfigNode):
             'batch_norm': configs.MODEL.ENABLE_BATCH_NORM,
             'dropout': configs.MODEL.ENABLE_DROPOUT,
             'padding_mode': 'zeros',
-            'merge_mode': 'padding',
         }
 
         model = LinearConvUNet(**kwargs)
