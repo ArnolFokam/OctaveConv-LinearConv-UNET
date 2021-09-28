@@ -160,7 +160,10 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
         self.model.train()
 
         for sample_batch in epoch_progress:
-            images, targets = sample_batch.to(self.device)
+            # TODO: sample_batch is a list, you should apply to(self.device) sepeartely
+            images, targets = sample_batch
+            images = images.to(self.device)
+            targets = targets.to(self.device)
 
             # model outputs inactivated logits
             logits = self.model(images)
@@ -234,7 +237,9 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
         self.model.eval()
         # epoch loop over dataset once
         for sample_batch in epoch_progress:
-            images, targets = sample_batch.to(self.device)
+            images, targets = sample_batch
+            images = images.to(self.device)
+            targets = targets.to(self.device)
 
             # model outputs unactivated logits
             logits = self.model(images)
@@ -392,7 +397,9 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
             # sample_id is the index according to the dataset
             sample_id = self.test_loader.dataset.dataset.indices[idx]
 
-            images, targets = sample_batch.to(self.device)
+            images, targets = sample_batch
+            images = images.to(self.device)
+            targets = targets.to(self.device)
 
             # model outputs inactivated logits
             logits = self.model(images)
