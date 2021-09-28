@@ -37,7 +37,7 @@ def get_model(configs: ConfigNode):
 
         model = OctaveUNet(**kwargs)
 
-    elif model_name == 'linear':
+    elif model_name == 'linearconv':
         kwargs = {
             'channels': configs.MODEL.CHANNELS,
             'variants': configs.MODEL.VARIANTS,
@@ -55,7 +55,7 @@ def get_model(configs: ConfigNode):
 
         model = LinearConvUNet(**kwargs)
 
-    else:
+    elif model_name == 'baseline':
         kwargs = {
             'channels': configs.MODEL.CHANNELS,
             'kernel_size': configs.MODEL.KERNEL_SIZE,
@@ -70,6 +70,8 @@ def get_model(configs: ConfigNode):
         }
 
         model = BaselineUNet(**kwargs)
+    else:
+        raise NotImplemented
 
     LOGGER.info('Retrieved model: %s', model_name)
 
