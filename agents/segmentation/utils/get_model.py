@@ -18,6 +18,7 @@ LOGGER = logging.getLogger(__name__)
 def get_model(configs: ConfigNode):
     """Get model."""
     model_name = configs.MODEL.MODEL_NAME
+    print(configs.MODEL.VARIANTS)
     if model_name == 'octave':
         kwargs = {
             'channels': configs.MODEL.CHANNELS,

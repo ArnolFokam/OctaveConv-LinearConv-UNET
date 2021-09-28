@@ -45,6 +45,13 @@ METRICS:
     THRESHOLD_METHOD: constant
   VALID_PATIENCE: 1
 MODEL:
+  ALPHAS:
+  - 0.0
+  - 0.75
+  - 0.75
+  - 0.75
+  - 0.75
+  - 0.0
   CHANNELS:
   - 3
   - 64
