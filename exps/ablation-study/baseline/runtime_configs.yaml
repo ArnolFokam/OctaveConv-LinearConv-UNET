@@ -10,7 +10,7 @@ DATA:
     DATASET_DIR: /storage/datasets/brain-lesion-seg/lgg-mri-segmentation/kaggle_3m
     IMAGE_SIZE: 224
     MASK_KEY: null
-    FRACTION: 0.1
+    FRACTION: 1.0
     WORKERS: 4
   ENABLE_SHUFFLE: true
 DEVICE:
