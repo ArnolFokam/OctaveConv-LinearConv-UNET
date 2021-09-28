@@ -38,7 +38,7 @@ METRICS:
   - prc
   - auroc
   - ap
-  - dsc
+  - dice
   MONITOR_NAMES: null
   THRESHOLD:
     BLOCK_SIZE: null
