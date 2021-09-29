@@ -9,6 +9,7 @@ import numpy as np
 from torch import nn
 
 from models.linearconv.layers.linear_conv2d import LinearConv2DSimple
+from models.linearconv.layers.linear_transpose_conv2d import LinearTransposeConv2DSimple
 
 LOGGER = logging.getLogger(__name__)
 
@@ -101,7 +102,7 @@ def compute_Conv2d_flops(module, inp, out):
 
 
 def compute_LinearConv2DSimple_flops(module, inp, out):
-    """Compute FLOPs of Conv2d."""
+    """Compute FLOPs of LinearConv2dSimple."""
     # Can have multiple inputs, getting the first one
     assert isinstance(module, LinearConv2DSimple)
     assert len(inp.size()) == 4
@@ -130,6 +131,40 @@ def compute_LinearConv2DSimple_flops(module, inp, out):
     total_add = total_mul - 1
     total_elements = (filters_per_channel - filters_per_channel // module.times)*(in_c * k_h * k_w)
     linear_ops = (total_mul + total_add)*total_elements
+
+    total_flops = linear_ops + total_conv_flops
+    return total_flops
+
+
+def compute_LinearTransposeConv2DSimple_flops(module, inp, out):
+    """Compute FLOPs of 2d transposed convolution."""
+    # Can have multiple inputs, getting the first one
+    assert isinstance(module, nn.ConvTranspose2d)
+    assert len(inp.size()) == 4
+    assert len(out.size()) == 4
+
+    batch_size, in_c, in_h, in_w = inp.size()
+    k_h, k_w = module.kernel_size
+    out_c = out.size()[1]
+    groups = module.groups
+
+    filters_per_channel = out_c // groups
+    conv_per_position_flops = k_h * k_w * in_c * filters_per_channel
+    active_elements_count = batch_size * in_h * in_w
+
+    total_conv_flops = conv_per_position_flops * active_elements_count
+
+    bias_flops = 0
+    if module.bias is not None:
+        bias_flops = out_c * active_elements_count
+
+    # get the total convolution operations
+    total_conv_flops = total_conv_flops + bias_flops
+
+    total_mul = out_c // module.times
+    total_add = total_mul - 1
+    total_elements = (filters_per_channel - filters_per_channel // module.times) * (in_c * k_h * k_w)
+    linear_ops = (total_mul + total_add) * total_elements
 
     total_flops = linear_ops + total_conv_flops
     return total_flops

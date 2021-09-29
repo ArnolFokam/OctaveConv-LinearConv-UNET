@@ -65,7 +65,8 @@ class LinearTransposeConv2DSimple(_LinearTransposeConv2D):
                  bias=True,
                  dilation=1,
                  padding_mode='zeros',
-                 output_padding=0):
+                 output_padding=0,
+                 ratio=2):
         super(LinearTransposeConv2DSimple, self).__init__(
             in_channels,
             out_channels,
@@ -76,7 +77,8 @@ class LinearTransposeConv2DSimple(_LinearTransposeConv2D):
             groups,
             bias,
             padding_mode,
-            output_padding)
+            output_padding,
+            ratio)
 
         self.linear_weights = nn.Parameter(
             torch.Tensor(out_channels - out_channels // self.times, out_channels // self.times))
@@ -94,42 +96,6 @@ class LinearTransposeConv2DSimple(_LinearTransposeConv2D):
                                   torch.cat((self.conv_weights, correlated_weights), dim=0),
                                   bias=self.bias, output_size=output_size)
 
-    @staticmethod
-    def count_op(m, x, y):
-        x = x[0]
-
-        multiply_adds = 1
-
-        cin = m.in_channels
-        cout = m.out_channels
-        kh, kw = m.kernel_size[0], m.kernel_size[0]
-        batch_size = x.size()[0]
-
-        out_h = y.size(2)
-        out_w = y.size(3)
-
-        # ops per output element
-        # kernel_mul = kh * kw * cin
-        # kernel_add = kh * kw * cin - 1
-        kernel_ops = multiply_adds * kh * kw
-        bias_ops = 1 if m.biasTrue is True else 0
-        ops_per_element = kernel_ops + bias_ops
-
-        # total ops
-        # num_out_elements = y.numel()
-        output_elements = batch_size * out_w * out_h * cout
-        conv_ops = output_elements * ops_per_element * cin // 1  # m.groups=1
-
-        # per output element
-        total_mul = m.out_channels // m.times
-        total_add = total_mul - 1
-        num_elements = (m.out_channels - m.out_channels // m.times) * (cin * kh * kw)
-        lin_ops = (total_mul + total_add) * num_elements
-        total_ops = lin_ops + conv_ops
-        print(lin_ops, conv_ops)
-
-        m.total_ops = torch.Tensor([int(total_ops)])
-
 
 # Const. low-rank version
 class LinearTransposeConv2DLowRank(_LinearTransposeConv2D):
@@ -144,7 +110,8 @@ class LinearTransposeConv2DLowRank(_LinearTransposeConv2D):
                  dilation=1,
                  padding_mode='zeros',
                  rank=1,
-                 output_padding=0):
+                 output_padding=0,
+                 ratio=2):
         super(LinearTransposeConv2DLowRank, self).__init__(
             in_channels,
             out_channels,
@@ -155,7 +122,8 @@ class LinearTransposeConv2DLowRank(_LinearTransposeConv2D):
             groups,
             bias,
             padding_mode,
-            output_padding)
+            output_padding,
+            ratio)
 
         self.rank = rank
 
@@ -181,46 +149,6 @@ class LinearTransposeConv2DLowRank(_LinearTransposeConv2D):
                                   torch.cat((self.conv_weights, correlated_weights), dim=0),
                                   bias=self.bias, output_size=output_size)
 
-    @staticmethod
-    def count_flops(m, x, y):
-        x = x[0]
-
-        multiply_adds = 1
-
-        cin = m.in_channels
-        cout = m.out_channels
-        kh, kw = m.kernel_size[0], m.kernel_size[0]
-        batch_size = x.size()[0]
-
-        out_h = y.size(2)
-        out_w = y.size(3)
-
-        # ops per output element
-        # kernel_mul = kh * kw * cin
-        # kernel_add = kh * kw * cin - 1
-        kernel_ops = multiply_adds * kh * kw
-        bias_ops = 1 if m.biasTrue is True else 0
-        ops_per_element = kernel_ops + bias_ops
-
-        # total ops
-        # num_out_elements = y.numel()
-        output_elements = batch_size * out_w * out_h * cout
-        conv_ops = output_elements * ops_per_element * cin // m.groups
-
-        # per output element
-        total_mul_1 = m.out_channels // m.times
-        total_add_1 = total_mul_1 - 1
-        num_elements_1 = m.rank * (cin * kh * kw)  # (m.out_channels - m.out_channels//m.times)
-        total_mul_2 = m.rank
-        total_add_2 = total_mul_2 - 1
-        num_elements_2 = (m.out_channels - m.out_channels // m.times) * (
-                cin * kh * kw)  # (m.out_channels - m.out_channels//m.times)
-        lin_ops = (total_mul_1 + total_add_1) * num_elements_1 + (total_mul_2 + total_add_2) * num_elements_2
-        total_ops = lin_ops + conv_ops
-        print(lin_ops, conv_ops)
-
-        m.total_ops = torch.Tensor([int(total_ops)])
-
 
 # Rank-ratio version
 class LinearTransposeConv2DRankRatio(_LinearTransposeConv2D):
@@ -235,7 +163,8 @@ class LinearTransposeConv2DRankRatio(_LinearTransposeConv2D):
                  dilation=1,
                  padding_mode='zeros',
                  rank=1,
-                 output_padding=0):
+                 output_padding=0,
+                 ratio=2):
         super(LinearTransposeConv2DRankRatio, self).__init__(
             in_channels,
             out_channels,
@@ -246,7 +175,8 @@ class LinearTransposeConv2DRankRatio(_LinearTransposeConv2D):
             groups,
             bias,
             padding_mode,
-            output_padding)
+            output_padding,
+            ratio)
 
         self.rank = rank
 
@@ -290,7 +220,8 @@ class LinearTransposeConv2DSparse(_LinearTransposeConv2D):
                  thresh_step=0.00001,
                  dilation=1,
                  bias=True,
-                 output_padding=0):
+                 output_padding=0,
+                 ratio=2):
         super(LinearTransposeConv2DSparse, self).__init__(
             in_channels,
             out_channels,
@@ -301,7 +232,8 @@ class LinearTransposeConv2DSparse(_LinearTransposeConv2D):
             groups,
             bias,
             padding_mode,
-            output_padding
+            output_padding,
+            ratio
         )
 
         self.prune_step = prune_step
