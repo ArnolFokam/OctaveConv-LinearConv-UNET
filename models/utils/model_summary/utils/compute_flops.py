@@ -142,7 +142,7 @@ def compute_LinearConv2DSimple_flops(module, inp, out):
 def compute_LinearTransposeConv2DSimple_flops(module, inp, out):
     """Compute FLOPs of 2d transposed convolution."""
     # Can have multiple inputs, getting the first one
-    assert isinstance(module, nn.ConvTranspose2d)
+    assert isinstance(module, LinearTransposeConv2DSimple)
     assert len(inp.size()) == 4
     assert len(out.size()) == 4
 
