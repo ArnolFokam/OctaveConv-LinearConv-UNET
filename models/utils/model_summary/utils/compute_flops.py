@@ -37,8 +37,10 @@ def compute_flops(module, inp, out):
     elif isinstance(module, nn.Linear):
         module_flops = compute_Linear_flops(module, inp, out)
 
+    elif isinstance(module,  LinearConv2DSimple):
+        module_flops = compute_LinearConv2DSimple_flops(module, inp, out)
+
     else:
-        print(module)
         module_flops = 0
 
     return module_flops
