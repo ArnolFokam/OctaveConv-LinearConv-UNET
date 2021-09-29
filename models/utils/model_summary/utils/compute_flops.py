@@ -36,6 +36,7 @@ def compute_flops(module, inp, out):
         module_flops = compute_Linear_flops(module, inp, out)
 
     else:
+        print(module)
         module_flops = 0
 
     return module_flops

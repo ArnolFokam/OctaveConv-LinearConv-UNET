@@ -160,7 +160,6 @@ class SegmentationAgent(SummaryHandler, StateHandler, OutputHandler, ABC):
         self.model.train()
 
         for sample_batch in epoch_progress:
-            # TODO: sample_batch is a list, you should apply to(self.device) sepeartely
             images, targets = sample_batch
             images = images.to(self.device)
             targets = targets.to(self.device)
