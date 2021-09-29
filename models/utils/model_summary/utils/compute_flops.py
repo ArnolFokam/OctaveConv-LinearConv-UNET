@@ -128,7 +128,7 @@ def compute_LinearConv2DSimple_flops(module, inp, out):
 
     total_mul = out_c // module.times
     total_add = total_mul - 1
-    total_elements = (module.filters - module.filters // module.times)*(in_c * k_h * k_w)
+    total_elements = (filters_per_channel - filters_per_channel // module.times)*(in_c * k_h * k_w)
     linear_ops = (total_mul + total_add)*total_elements
 
     total_flops = linear_ops + total_conv_flops
