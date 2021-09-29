@@ -41,6 +41,9 @@ def compute_flops(module, inp, out):
     elif isinstance(module,  LinearConv2DSimple):
         module_flops = compute_LinearConv2DSimple_flops(module, inp, out)
 
+    elif isinstance(module, LinearTransposeConv2DSimple):
+        module_flops = compute_LinearTransposeConv2DSimple_flops(module, inp, out)
+
     else:
         module_flops = 0
 
