@@ -52,6 +52,13 @@ MODEL:
   - linear_simple
   - linear_simple
   - linear_simple
+  RATIOS:
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
   CHANNELS:
   - 3
   - 64

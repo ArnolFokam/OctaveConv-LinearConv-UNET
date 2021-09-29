@@ -11,6 +11,7 @@ class LinearConvUNet(UNetBackBone):
     def __init__(self,
                  channels=None,
                  variants=None,
+                 ratios=None,
                  kernel_size=3,
                  stride=2,
                  padding=1,
@@ -34,12 +35,14 @@ class LinearConvUNet(UNetBackBone):
             padding_mode)
 
         encoder_variants = variants[1:-1]
+        encoder_ratios = ratios[1:-1]
         encoder_input_channels = self.channels[1:-1]
         encoder_output_channels = self.channels[2:-1] + self.channels[-2:-1]
 
         decoder_input_channels = self.channels[-2:0:-1]
         decoder_output_channels = self.channels[-3:0:-1] + self.channels[1:2]
         decoder_variants = variants[-2:0:-1]
+        decoder_ratios = ratios[-2:0:-1]
 
         self.add_module("encoder_0",
                         DoubleLinearConvBlock(in_channels=self.channels[0],
@@ -55,12 +58,14 @@ class LinearConvUNet(UNetBackBone):
                                               groups=self.groups,
                                               bias=self.bias,
                                               padding_mode=self.padding_mode,
-                                              variant=variants[0]))
+                                              variant=variants[0],
+                                              ratio=ratios[0]))
 
         i = 0
-        for input_channel, output_channel, variant in zip(encoder_input_channels,
-                                                          encoder_output_channels,
-                                                          encoder_variants):
+        for input_channel, output_channel, variant, ratio in zip(encoder_input_channels,
+                                                                 encoder_output_channels,
+                                                                 encoder_variants,
+                                                                 encoder_ratios):
             i += 1
             self.add_module('encoder_{}'.format(i),
                             EncoderBlock(in_channels=input_channel,
@@ -78,13 +83,15 @@ class LinearConvUNet(UNetBackBone):
                                          groups=self.groups,
                                          bias=self.bias,
                                          padding_mode=self.padding_mode,
-                                         variant=variant))
+                                         variant=variant,
+                                         ratio=ratio))
 
         i = len(decoder_input_channels)
-        for input_channel, output_channel, variant in zip(
+        for input_channel, output_channel, variant, ratio in zip(
                 decoder_input_channels,
                 decoder_output_channels,
-                decoder_variants):
+                decoder_variants,
+        decoder_ratios):
             self.add_module('decoder_{}'.format(i),
                             DecoderBlock(in_channels=input_channel,
                                          mid_channels=output_channel,
@@ -102,7 +109,8 @@ class LinearConvUNet(UNetBackBone):
                                          groups=self.groups,
                                          bias=self.bias,
                                          padding_mode=self.padding_mode,
-                                         variant=variant))
+                                         variant=variant,
+                                         ratio=ratio))
             i -= 1
 
         self.add_module('decoder_0',

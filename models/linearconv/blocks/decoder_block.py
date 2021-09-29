@@ -30,7 +30,8 @@ class DecoderBlock(nn.Module):
                  rank=1,
                  prune_step=500,
                  req_percentile=0.25,
-                 thresh_step=0.00001):
+                 thresh_step=0.00001,
+                 ratio=2):
         super(DecoderBlock, self).__init__()
 
         if upsample == 'transp':
@@ -48,7 +49,8 @@ class DecoderBlock(nn.Module):
                                                      rank=rank,
                                                      prune_step=prune_step,
                                                      req_percentile=req_percentile,
-                                                     thresh_step=thresh_step)
+                                                     thresh_step=thresh_step,
+                                                     ratio=ratio)
 
         elif upsample in ('bilinear', 'nearest'):
             self.upsample = nn.Upsample(
@@ -72,7 +74,8 @@ class DecoderBlock(nn.Module):
             rank=rank,
             prune_step=prune_step,
             req_percentile=req_percentile,
-            thresh_step=thresh_step
+            thresh_step=thresh_step,
+            ratio=ratio
         )
 
     # pylint: disable=arguments-differ

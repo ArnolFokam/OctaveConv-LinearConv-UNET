@@ -40,6 +40,7 @@ def get_model(configs: ConfigNode):
         kwargs = {
             'channels': configs.MODEL.CHANNELS,
             'variants': configs.MODEL.VARIANTS,
+            'ratios': configs.MODEL.RATIOS,
             'kernel_size': configs.MODEL.KERNEL_SIZE,
             'stride': configs.MODEL.STRIDE,
             'padding': configs.MODEL.PADDING,

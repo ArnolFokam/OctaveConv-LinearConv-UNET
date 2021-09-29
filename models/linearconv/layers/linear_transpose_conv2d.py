@@ -17,7 +17,8 @@ class _LinearTransposeConv2D(_ConvTransposeNd):
                  groups=1,
                  bias=True,
                  padding_mode='zeros',
-                 output_padding=0):
+                 output_padding=0,
+                 ratio=2):
         self.kernel_size_int = kernel_size
         kernel_size = _pair(kernel_size)
         stride = _pair(stride)
@@ -26,9 +27,9 @@ class _LinearTransposeConv2D(_ConvTransposeNd):
         output_padding = _pair(output_padding)
 
         super(_LinearTransposeConv2D, self).__init__(in_channels, out_channels, kernel_size, stride, padding,
-                                            dilation, True, output_padding, groups, bias, padding_mode)
+                                                     dilation, True, output_padding, groups, bias, padding_mode)
 
-        self.times = 2  # ratio 1/2
+        self.times = ratio  # default: ratio 1/2
 
         # we don't need pytorch generated
         # weights from _ConvNd since we
@@ -75,7 +76,7 @@ class LinearTransposeConv2DSimple(_LinearTransposeConv2D):
             groups,
             bias,
             padding_mode,
-        output_padding)
+            output_padding)
 
         self.linear_weights = nn.Parameter(
             torch.Tensor(out_channels - out_channels // self.times, out_channels // self.times))
@@ -154,7 +155,7 @@ class LinearTransposeConv2DLowRank(_LinearTransposeConv2D):
             groups,
             bias,
             padding_mode,
-        output_padding)
+            output_padding)
 
         self.rank = rank
 
@@ -245,7 +246,7 @@ class LinearTransposeConv2DRankRatio(_LinearTransposeConv2D):
             groups,
             bias,
             padding_mode,
-        output_padding)
+            output_padding)
 
         self.rank = rank
 

@@ -24,7 +24,8 @@ class EncoderBlock(nn.Module):
                  rank=1,
                  prune_step=500,
                  req_percentile=0.25,
-                 thresh_step=0.00001):
+                 thresh_step=0.00001,
+                 ratio=2):
         super(EncoderBlock, self).__init__()
 
         if downsample == 'max':
@@ -52,7 +53,8 @@ class EncoderBlock(nn.Module):
                                               rank=rank,
                                               prune_step=prune_step,
                                               req_percentile=req_percentile,
-                                              thresh_step=thresh_step)
+                                              thresh_step=thresh_step,
+                                              ratio=ratio)
 
         else:
             raise NotImplementedError
@@ -74,7 +76,8 @@ class EncoderBlock(nn.Module):
                                                  rank=rank,
                                                  prune_step=prune_step,
                                                  req_percentile=req_percentile,
-                                                 thresh_step=thresh_step)
+                                                 thresh_step=thresh_step,
+                                                 ratio=ratio)
 
     # pylint: disable=arguments-differ
     def forward(self, x):

@@ -16,7 +16,8 @@ class _LinearConv2D(_ConvNd):
                  dilation=1,
                  groups=1,
                  bias=True,
-                 padding_mode='zeros'):
+                 padding_mode='zeros',
+                 ratio=2):
         self.kernel_size_int = kernel_size
         kernel_size_ = _pair(kernel_size)
         stride_ = _pair(stride)
@@ -36,7 +37,7 @@ class _LinearConv2D(_ConvNd):
             bias,
             padding_mode)
 
-        self.times = 2  # ratio 1/2
+        self.times = ratio  # default ratio 1/2
 
         # we don't need pytorch generated
         # weights from _ConvNd since we
@@ -79,7 +80,8 @@ class LinearConv2DSimple(_LinearConv2D):
                  groups=1,
                  bias=True,
                  dilation=1,
-                 padding_mode='zeros'):
+                 padding_mode='zeros',
+                 ratio=2):
 
         super(LinearConv2DSimple, self).__init__(
             in_channels,
@@ -90,7 +92,8 @@ class LinearConv2DSimple(_LinearConv2D):
             dilation,
             groups,
             bias,
-            padding_mode)
+            padding_mode,
+            ratio)
 
         self.linear_weights = nn.Parameter(
             torch.Tensor(out_channels - out_channels // self.times, out_channels // self.times))
@@ -108,42 +111,6 @@ class LinearConv2DSimple(_LinearConv2D):
                                   torch.cat((self.conv_weights, correlated_weights), dim=0),
                                   bias=self.bias)
 
-    @staticmethod
-    def count_op(m, x, y):
-        x = x[0]
-
-        multiply_adds = 1
-
-        cin = m.in_channels
-        cout = m.out_channels
-        kh, kw = m.kernel_size[0], m.kernel_size[0]
-        batch_size = x.size()[0]
-
-        out_h = y.size(2)
-        out_w = y.size(3)
-
-        # ops per output element
-        # kernel_mul = kh * kw * cin
-        # kernel_add = kh * kw * cin - 1
-        kernel_ops = multiply_adds * kh * kw
-        bias_ops = 1 if m.biasTrue is True else 0
-        ops_per_element = kernel_ops + bias_ops
-
-        # total ops
-        # num_out_elements = y.numel()
-        output_elements = batch_size * out_w * out_h * cout
-        conv_ops = output_elements * ops_per_element * cin // 1  # m.groups=1
-
-        # per output element
-        total_mul = m.out_channels // m.times
-        total_add = total_mul - 1
-        num_elements = (m.out_channels - m.out_channels // m.times) * (cin * kh * kw)
-        lin_ops = (total_mul + total_add) * num_elements
-        total_ops = lin_ops + conv_ops
-        print(lin_ops, conv_ops)
-
-        m.total_ops = torch.Tensor([int(total_ops)])
-
 
 # Const. low-rank version
 class LinearConv2DLowRank(_LinearConv2D):
@@ -157,7 +124,8 @@ class LinearConv2DLowRank(_LinearConv2D):
                  bias=True,
                  dilation=1,
                  padding_mode='zeros',
-                 rank=1):
+                 rank=1,
+                 ratio=2):
 
         super(LinearConv2DLowRank, self).__init__(
             in_channels,
@@ -168,7 +136,8 @@ class LinearConv2DLowRank(_LinearConv2D):
             dilation,
             groups,
             bias,
-            padding_mode)
+            padding_mode,
+            ratio)
 
         self.rank = rank
 
@@ -194,46 +163,6 @@ class LinearConv2DLowRank(_LinearConv2D):
                                   torch.cat((self.conv_weights, correlated_weights), dim=0),
                                   bias=self.bias)
 
-    @staticmethod
-    def count_flops(m, x, y):
-        x = x[0]
-
-        multiply_adds = 1
-
-        cin = m.in_channels
-        cout = m.out_channels
-        kh, kw = m.kernel_size[0], m.kernel_size[0]
-        batch_size = x.size()[0]
-
-        out_h = y.size(2)
-        out_w = y.size(3)
-
-        # ops per output element
-        # kernel_mul = kh * kw * cin
-        # kernel_add = kh * kw * cin - 1
-        kernel_ops = multiply_adds * kh * kw
-        bias_ops = 1 if m.biasTrue is True else 0
-        ops_per_element = kernel_ops + bias_ops
-
-        # total ops
-        # num_out_elements = y.numel()
-        output_elements = batch_size * out_w * out_h * cout
-        conv_ops = output_elements * ops_per_element * cin // m.groups
-
-        # per output element
-        total_mul_1 = m.out_channels // m.times
-        total_add_1 = total_mul_1 - 1
-        num_elements_1 = m.rank * (cin * kh * kw)  # (m.out_channels - m.out_channels//m.times)
-        total_mul_2 = m.rank
-        total_add_2 = total_mul_2 - 1
-        num_elements_2 = (m.out_channels - m.out_channels // m.times) * (
-                cin * kh * kw)  # (m.out_channels - m.out_channels//m.times)
-        lin_ops = (total_mul_1 + total_add_1) * num_elements_1 + (total_mul_2 + total_add_2) * num_elements_2
-        total_ops = lin_ops + conv_ops
-        print(lin_ops, conv_ops)
-
-        m.total_ops = torch.Tensor([int(total_ops)])
-
 
 # Rank-ratio version
 class LinearConv2DRankRatio(_LinearConv2D):
@@ -247,7 +176,8 @@ class LinearConv2DRankRatio(_LinearConv2D):
                  bias=True,
                  dilation=1,
                  padding_mode='zeros',
-                 rank=1):
+                 rank=1,
+                 ratio=2):
 
         super(LinearConv2DRankRatio, self).__init__(
             in_channels,
@@ -258,7 +188,8 @@ class LinearConv2DRankRatio(_LinearConv2D):
             dilation,
             groups,
             bias,
-            padding_mode)
+            padding_mode,
+            ratio)
 
         self.rank = rank
 
@@ -301,7 +232,8 @@ class LinearConv2DSparse(_LinearConv2D):
                  req_percentile=0.25,
                  thresh_step=0.00001,
                  dilation=1,
-                 bias=True):
+                 bias=True,
+                 ratio=2):
         super(LinearConv2DSparse, self).__init__(
             in_channels,
             out_channels,
@@ -312,7 +244,7 @@ class LinearConv2DSparse(_LinearConv2D):
             groups,
             bias,
             padding_mode,
-        )
+            ratio)
 
         self.prune_step = prune_step
         self.req_percentile = req_percentile

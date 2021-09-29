@@ -25,7 +25,8 @@ class LinearConvBlock(nn.Module):
                  rank=1,
                  prune_step=500,
                  req_percentile=0.25,
-                 thresh_step=0.00001):
+                 thresh_step=0.00001,
+                 ratio=2):
         super(LinearConvBlock, self).__init__()
 
         possible_variants = ['linear_simple',
@@ -45,7 +46,8 @@ class LinearConvBlock(nn.Module):
                                            dilation=dilation,
                                            groups=groups,
                                            bias=bias,
-                                           padding_mode=padding_mode)
+                                           padding_mode=padding_mode,
+                                           ratio=ratio)
 
         elif variant == 'linear_lowrank':
             self.conv = LinearConv2DLowRank(in_channels,
@@ -57,7 +59,8 @@ class LinearConvBlock(nn.Module):
                                             groups=groups,
                                             bias=bias,
                                             padding_mode=padding_mode,
-                                            rank=rank)
+                                            rank=rank,
+                                            ratio=ratio)
 
         elif variant == 'linear_rankratio':
             self.conv = LinearConv2DLowRank(in_channels,
@@ -69,7 +72,8 @@ class LinearConvBlock(nn.Module):
                                             groups=groups,
                                             bias=bias,
                                             padding_mode=padding_mode,
-                                            rank=rank)
+                                            rank=rank,
+                                            ratio=ratio)
 
         elif variant == 'linear_sparse':
             self.conv = LinearConv2DSparse(in_channels,
@@ -83,7 +87,8 @@ class LinearConvBlock(nn.Module):
                                            padding_mode=padding_mode,
                                            prune_step=prune_step,
                                            req_percentile=req_percentile,
-                                           thresh_step=thresh_step)
+                                           thresh_step=thresh_step,
+                                           ratio=ratio)
 
         else:
             self.conv = nn.Conv2d(in_channels,
@@ -149,7 +154,8 @@ class LinearTransposeConvBlock(nn.Module):
                  rank=1,
                  prune_step=500,
                  req_percentile=0.25,
-                 thresh_step=0.00001):
+                 thresh_step=0.00001,
+                 ratio=2):
         super(LinearTransposeConvBlock, self).__init__()
 
         possible_variants = ['linear_simple',
@@ -170,7 +176,8 @@ class LinearTransposeConvBlock(nn.Module):
                                                     groups=groups,
                                                     bias=bias,
                                                     padding_mode=padding_mode,
-                                                    output_padding=output_padding)
+                                                    output_padding=output_padding,
+                                                    ratio=ratio)
 
         elif variant == 'linear_lowrank':
             self.conv = LinearTransposeConv2DLowRank(in_channels,
@@ -183,7 +190,8 @@ class LinearTransposeConvBlock(nn.Module):
                                                      bias=bias,
                                                      padding_mode=padding_mode,
                                                      rank=rank,
-                                                     output_padding=output_padding)
+                                                     output_padding=output_padding,
+                                                     ratio=ratio)
 
         elif variant == 'linear_rankratio':
             self.conv = LinearTransposeConv2DRankRatio(in_channels,
@@ -196,7 +204,8 @@ class LinearTransposeConvBlock(nn.Module):
                                                        bias=bias,
                                                        padding_mode=padding_mode,
                                                        rank=rank,
-                                                       output_padding=output_padding)
+                                                       output_padding=output_padding,
+                                                       ratio=ratio)
 
         elif variant == 'linear_sparse':
             self.conv = LinearTransposeConv2DSparse(in_channels,
@@ -211,7 +220,8 @@ class LinearTransposeConvBlock(nn.Module):
                                                     prune_step=prune_step,
                                                     req_percentile=req_percentile,
                                                     thresh_step=thresh_step,
-                                                    output_padding=output_padding)
+                                                    output_padding=output_padding,
+                                                    ratio=ratio)
 
         else:
             self.conv = nn.ConvTranspose2d(in_channels,
@@ -252,7 +262,8 @@ class DoubleLinearConvBlock(nn.Module):
                  rank=1,
                  prune_step=500,
                  req_percentile=0.25,
-                 thresh_step=0.00001):
+                 thresh_step=0.00001,
+                 ratio=2):
         super(DoubleLinearConvBlock, self).__init__()
 
         self.conv_block_1 = LinearConvBlock(in_channels,
@@ -271,7 +282,8 @@ class DoubleLinearConvBlock(nn.Module):
                                             variant=variant,
                                             prune_step=prune_step,
                                             req_percentile=req_percentile,
-                                            thresh_step=thresh_step)
+                                            thresh_step=thresh_step,
+                                            ratio=ratio)
 
         self.conv_block_2 = LinearConvBlock(mid_channels,
                                             out_channels,
@@ -289,7 +301,8 @@ class DoubleLinearConvBlock(nn.Module):
                                             rank=rank,
                                             prune_step=prune_step,
                                             req_percentile=req_percentile,
-                                            thresh_step=thresh_step)
+                                            thresh_step=thresh_step,
+                                            ratio=ratio)
 
     # pylint: disable=arguments-differ
     def forward(self, x):
