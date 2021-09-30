@@ -20,7 +20,7 @@ DEVICE:
 LOCAL:
   CKPT_EXT: .pth
   CKPT_SUBDIR: ckpts
-  EXP_ROOT: exps/ablation-study/octave/ratio_0.5
+  EXP_ROOT: exps/ablation-study/octave_linearconv/ratio_0.5_alpha_0.75
   EXP_SUBDIR: .
   LOG_SUBDIR: logs
   OUT_SUBDIR: outs
@@ -45,12 +45,26 @@ METRICS:
     THRESHOLD_METHOD: constant
   VALID_PATIENCE: 1
 MODEL:
+  VARIANTS:
+  - linear_simple
+  - linear_simple
+  - linear_simple
+  - linear_simple
+  - linear_simple
+  - linear_simple
+  RATIOS:
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
+  - 2
   ALPHAS:
   - 0.0
-  - 0.5
-  - 0.5
-  - 0.5
-  - 0.5
+  - 0.75
+  - 0.75
+  - 0.75
+  - 0.75
   - 0.0
   CHANNELS:
   - 3
@@ -65,7 +79,7 @@ MODEL:
   ENABLE_DROPOUT: false
   GROUPS: 1
   KERNEL_SIZE: 3
-  MODEL_NAME: octave
+  MODEL_NAME: octavelinearconv
   PADDING: 1
   STRIDE: 1
 OPTIM:

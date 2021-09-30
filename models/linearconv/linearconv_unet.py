@@ -91,7 +91,7 @@ class LinearConvUNet(UNetBackBone):
                 decoder_input_channels,
                 decoder_output_channels,
                 decoder_variants,
-        decoder_ratios):
+                decoder_ratios):
             self.add_module('decoder_{}'.format(i),
                             DecoderBlock(in_channels=input_channel,
                                          mid_channels=output_channel,

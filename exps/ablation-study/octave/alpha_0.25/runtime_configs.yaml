@@ -20,7 +20,7 @@ DEVICE:
 LOCAL:
   CKPT_EXT: .pth
   CKPT_SUBDIR: ckpts
-  EXP_ROOT: exps/ablation-study/octave/alpha_0.25
+  EXP_ROOT: exps/ablation-study/octave/ratio_0.25
   EXP_SUBDIR: .
   LOG_SUBDIR: logs
   OUT_SUBDIR: outs

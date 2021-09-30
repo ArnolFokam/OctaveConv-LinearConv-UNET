@@ -21,7 +21,7 @@ class EncoderBlock(nn.Module):
                  batch_norm=True, dropout=False, act_fn=None,
                  spatial_ratio=2, merge_mode='padding',
                  kernel_size=3, stride=1, padding=1, dilation=1, groups=1,
-                 bias=True, padding_mode='zeros'):
+                 bias=True, padding_mode='zeros', **kwargs):
         super(EncoderBlock, self).__init__()
 
         if downsample == 'max':
@@ -44,7 +44,8 @@ class EncoderBlock(nn.Module):
                                               dilation=1,
                                               groups=1,
                                               bias=True,
-                                              padding_mode='zeros')
+                                              padding_mode='zeros',
+                                              **kwargs)
 
         else:
             raise NotImplementedError
@@ -63,7 +64,8 @@ class EncoderBlock(nn.Module):
                                                  dilation=dilation,
                                                  groups=groups,
                                                  bias=bias,
-                                                 padding_mode=padding_mode)
+                                                 padding_mode=padding_mode,
+                                                 **kwargs)
 
     # pylint: disable=arguments-differ
     def forward(self, input_h, input_l):

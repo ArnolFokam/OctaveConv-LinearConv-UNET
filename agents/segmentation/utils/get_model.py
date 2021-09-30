@@ -6,6 +6,7 @@ from __future__ import print_function
 
 import logging
 from configs.config_node import ConfigNode
+from models.octave.octave_linearconv_unet import OctaveLinearConvUNet
 
 from models.octave.octave_unet import OctaveUNet
 from models.linearconv.linearconv_unet import LinearConvUNet
@@ -53,6 +54,25 @@ def get_model(configs: ConfigNode):
         }
 
         model = LinearConvUNet(**kwargs)
+
+    elif model_name == 'octavelinearconv':
+        kwargs = {
+            'channels': configs.MODEL.CHANNELS,
+            'variants': configs.MODEL.VARIANTS,
+            'alphas': configs.MODEL.ALPHAS,
+            'ratios': configs.MODEL.RATIOS,
+            'kernel_size': configs.MODEL.KERNEL_SIZE,
+            'stride': configs.MODEL.STRIDE,
+            'padding': configs.MODEL.PADDING,
+            'dilation': configs.MODEL.DILATION,
+            'groups': configs.MODEL.GROUPS,
+            'bias': configs.MODEL.ENABLE_BIAS,
+            'batch_norm': configs.MODEL.ENABLE_BATCH_NORM,
+            'dropout': configs.MODEL.ENABLE_DROPOUT,
+            'padding_mode': 'zeros',
+        }
+
+        model = OctaveLinearConvUNet(**kwargs)
 
     elif model_name == 'baseline':
         kwargs = {

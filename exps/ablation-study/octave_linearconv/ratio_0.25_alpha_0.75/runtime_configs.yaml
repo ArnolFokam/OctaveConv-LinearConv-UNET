@@ -20,7 +20,7 @@ DEVICE:
 LOCAL:
   CKPT_EXT: .pth
   CKPT_SUBDIR: ckpts
-  EXP_ROOT: exps/ablation-study/linearconv/alpha_0.5
+  EXP_ROOT: exps/ablation-study/octave_linearconv/ratio_0.25_alpha_0.75
   EXP_SUBDIR: .
   LOG_SUBDIR: logs
   OUT_SUBDIR: outs
@@ -53,12 +53,19 @@ MODEL:
   - linear_simple
   - linear_simple
   RATIOS:
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
-  - 2
+  - 4
+  - 4
+  - 4
+  - 4
+  - 4
+  - 4
+  ALPHAS:
+  - 0.0
+  - 0.75
+  - 0.75
+  - 0.75
+  - 0.75
+  - 0.0
   CHANNELS:
   - 3
   - 64
@@ -72,7 +79,7 @@ MODEL:
   ENABLE_DROPOUT: false
   GROUPS: 1
   KERNEL_SIZE: 3
-  MODEL_NAME: linearconv
+  MODEL_NAME: octavelinearconv
   PADDING: 1
   STRIDE: 1
 OPTIM:

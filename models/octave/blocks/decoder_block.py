@@ -21,7 +21,7 @@ class DecoderBlock(nn.Module):
                  batch_norm=True, dropout=False, act_fn=None,
                  spatial_ratio=2, merge_mode='padding',
                  kernel_size=3, stride=1, padding=1, output_padding=1,
-                 dilation=1, groups=1, bias=True, padding_mode='zeros'):
+                 dilation=1, groups=1, bias=True, padding_mode='zeros', **kwargs):
         super(DecoderBlock, self).__init__()
 
         if upsample == 'transp':
@@ -32,7 +32,7 @@ class DecoderBlock(nn.Module):
                 kernel_size=kernel_size, stride=scale_factor,
                 padding=padding, output_padding=output_padding,
                 groups=groups, bias=bias, dilation=dilation,
-                padding_mode=padding_mode
+                padding_mode=padding_mode, **kwargs
             )
 
         elif upsample in ('bilinear', 'nearest'):
@@ -53,7 +53,7 @@ class DecoderBlock(nn.Module):
             spatial_ratio=spatial_ratio, merge_mode=merge_mode,
             kernel_size=kernel_size, stride=stride,
             padding=padding, dilation=dilation, groups=groups,
-            bias=bias, padding_mode=padding_mode
+            bias=bias, padding_mode=padding_mode, **kwargs
         )
 
     # pylint: disable=arguments-differ

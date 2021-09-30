@@ -7,6 +7,9 @@ from __future__ import print_function
 import logging
 from torch import nn
 
+from models.linearconv.layers.linear_conv2d import LinearConv2DSimple
+from models.linearconv.layers.linear_transpose_conv2d import LinearTransposeConv2DSimple
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -18,10 +21,10 @@ def compute_memory(module, inp, out):
     elif isinstance(module, nn.PReLU):
         module_memory = compute_PReLU_memory(module, inp, out)
 
-    elif isinstance(module, nn.Conv2d):
+    elif isinstance(module, (nn.Conv2d, LinearConv2DSimple)):
         module_memory = compute_Conv2d_memory(module, inp, out)
 
-    elif isinstance(module, nn.ConvTranspose2d):
+    elif isinstance(module, (nn.ConvTranspose2d, LinearTransposeConv2DSimple)):
         module_memory = compute_ConvTranspose2d_memory(module, inp, out)
 
     elif isinstance(module, nn.BatchNorm2d):
@@ -65,7 +68,7 @@ def compute_PReLU_memory(module, inp, out):
 def compute_ConvTranspose2d_memory(module, inp, out):
     """Compute memory usage of ConvTranspose2d."""
     # Can have multiple inputs, getting the first one
-    assert isinstance(module, nn.ConvTranspose2d)
+    assert isinstance(module, nn.ConvTranspose2d, LinearTransposeConv2DSimple)
     assert len(inp.size()) == 4
     assert len(out.size()) == 4
 
@@ -79,7 +82,7 @@ def compute_ConvTranspose2d_memory(module, inp, out):
 def compute_Conv2d_memory(module, inp, out):
     """Compute memory usage of Conv2d."""
     # Can have multiple inputs, getting the first one
-    assert isinstance(module, nn.Conv2d)
+    assert isinstance(module, nn.Conv2d, LinearConv2DSimple)
     assert len(inp.size()) == 4
     assert len(out.size()) == 4
 

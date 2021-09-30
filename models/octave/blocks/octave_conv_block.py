@@ -9,6 +9,7 @@ from models.octave.layers.octave_activation import OctaveBatchNorm
 from models.octave.layers.octave_activation import OctaveDropout2d
 from models.octave.layers.octave_activation import OctaveReLU
 from models.octave.layers.octave_activation import OctaveSigmoid
+from models.octave.layers.octave_linearconv2d import OctaveLinearConvTranspose2d, OctaveLinearConv2d
 
 
 class OctaveConvBlock(nn.Module):
@@ -19,20 +20,34 @@ class OctaveConvBlock(nn.Module):
                  batch_norm=True, dropout=False, act_fn=None,
                  spatial_ratio=2, merge_mode='padding',
                  kernel_size=3, stride=1, padding=1, dilation=1, groups=1,
-                 bias=True, padding_mode='zeros'):
+                 bias=True, padding_mode='zeros', **kwargs):
         super(OctaveConvBlock, self).__init__()
 
-        self.conv = OctaveConv2d(in_channels, out_channels,
-                                 in_alpha, out_alpha,
-                                 spatial_ratio=spatial_ratio,
-                                 merge_mode=merge_mode,
-                                 kernel_size=kernel_size,
-                                 stride=stride,
-                                 padding=padding,
-                                 dilation=dilation,
-                                 groups=groups,
-                                 bias=bias,
-                                 padding_mode=padding_mode)
+        if kwargs.get('variant') is None:
+            self.conv = OctaveConv2d(in_channels, out_channels,
+                                     in_alpha, out_alpha,
+                                     spatial_ratio=spatial_ratio,
+                                     merge_mode=merge_mode,
+                                     kernel_size=kernel_size,
+                                     stride=stride,
+                                     padding=padding,
+                                     dilation=dilation,
+                                     groups=groups,
+                                     bias=bias,
+                                     padding_mode=padding_mode)
+        else:
+            self.conv = OctaveLinearConv2d(in_channels, out_channels,
+                                           in_alpha, out_alpha,
+                                           spatial_ratio=spatial_ratio,
+                                           merge_mode=merge_mode,
+                                           kernel_size=kernel_size,
+                                           stride=stride,
+                                           padding=padding,
+                                           dilation=dilation,
+                                           groups=groups,
+                                           bias=bias,
+                                           padding_mode=padding_mode,
+                                           **kwargs)
 
         if batch_norm is True:
             self.batch_norm = OctaveBatchNorm(in_channels=out_channels,
@@ -78,38 +93,41 @@ class DoubleOctaveConvBlock(nn.Module):
                  batch_norm=True, dropout=False, act_fn=None,
                  spatial_ratio=2, merge_mode='padding',
                  kernel_size=3, stride=1, padding=1, dilation=1, groups=1,
-                 bias=True, padding_mode='zeros'):
+                 bias=True, padding_mode='zeros', **kwargs):
         super(DoubleOctaveConvBlock, self).__init__()
 
-        self.conv_block_1 = OctaveConvBlock(in_channels, mid_channels,
-                                            in_alpha, mid_alpha,
-                                            batch_norm=batch_norm,
-                                            dropout=dropout,
-                                            act_fn=act_fn,
-                                            spatial_ratio=spatial_ratio,
-                                            merge_mode=merge_mode,
-                                            kernel_size=kernel_size,
-                                            stride=stride,
-                                            padding=padding,
-                                            dilation=dilation,
-                                            groups=groups,
-                                            bias=bias,
-                                            padding_mode=padding_mode)
+        if kwargs.get('variant') is None:
+            self.conv_block_1 = OctaveConvBlock(in_channels, mid_channels,
+                                                in_alpha, mid_alpha,
+                                                batch_norm=batch_norm,
+                                                dropout=dropout,
+                                                act_fn=act_fn,
+                                                spatial_ratio=spatial_ratio,
+                                                merge_mode=merge_mode,
+                                                kernel_size=kernel_size,
+                                                stride=stride,
+                                                padding=padding,
+                                                dilation=dilation,
+                                                groups=groups,
+                                                bias=bias,
+                                                padding_mode=padding_mode,
+                                                **kwargs)
 
-        self.conv_block_2 = OctaveConvBlock(mid_channels, out_channels,
-                                            mid_alpha, out_alpha,
-                                            batch_norm=batch_norm,
-                                            dropout=dropout,
-                                            act_fn=act_fn,
-                                            spatial_ratio=spatial_ratio,
-                                            merge_mode=merge_mode,
-                                            kernel_size=kernel_size,
-                                            stride=stride,
-                                            padding=padding,
-                                            dilation=dilation,
-                                            groups=groups,
-                                            bias=bias,
-                                            padding_mode=padding_mode)
+            self.conv_block_2 = OctaveConvBlock(mid_channels, out_channels,
+                                                mid_alpha, out_alpha,
+                                                batch_norm=batch_norm,
+                                                dropout=dropout,
+                                                act_fn=act_fn,
+                                                spatial_ratio=spatial_ratio,
+                                                merge_mode=merge_mode,
+                                                kernel_size=kernel_size,
+                                                stride=stride,
+                                                padding=padding,
+                                                dilation=dilation,
+                                                groups=groups,
+                                                bias=bias,
+                                                padding_mode=padding_mode,
+                                                **kwargs)
 
     # pylint: disable=arguments-differ
     def forward(self, input_h, input_l):
@@ -129,17 +147,28 @@ class OctaveConvTransposeBlock(nn.Module):
                  batch_norm=True, dropout=False, act_fn=None,
                  spatial_ratio=2, merge_mode='padding',
                  kernel_size=3, stride=2, padding=1, output_padding=1,
-                 groups=1, bias=True, dilation=1, padding_mode='zeros'):
+                 groups=1, bias=True, dilation=1, padding_mode='zeros', **kwargs):
         super(OctaveConvTransposeBlock, self).__init__()
 
-        self.conv_transp = OctaveConvTranspose2d(
-            in_channels, out_channels, in_alpha, out_alpha,
-            spatial_ratio=spatial_ratio, merge_mode=merge_mode,
-            kernel_size=kernel_size, stride=stride,
-            padding=padding, output_padding=output_padding,
-            groups=groups, bias=bias, dilation=dilation,
-            padding_mode=padding_mode
-        )
+        if kwargs.get('variant') is None:
+            self.conv_transp = OctaveConvTranspose2d(
+                in_channels, out_channels, in_alpha, out_alpha,
+                spatial_ratio=spatial_ratio, merge_mode=merge_mode,
+                kernel_size=kernel_size, stride=stride,
+                padding=padding, output_padding=output_padding,
+                groups=groups, bias=bias, dilation=dilation,
+                padding_mode=padding_mode
+            )
+        else:
+            self.conv_transp = OctaveLinearConvTranspose2d(
+                in_channels, out_channels, in_alpha, out_alpha,
+                spatial_ratio=spatial_ratio, merge_mode=merge_mode,
+                kernel_size=kernel_size, stride=stride,
+                padding=padding, output_padding=output_padding,
+                groups=groups, bias=bias, dilation=dilation,
+                padding_mode=padding_mode,
+                **kwargs
+            )
 
         if batch_norm is True:
             self.batch_norm = OctaveBatchNorm(in_channels=out_channels,
