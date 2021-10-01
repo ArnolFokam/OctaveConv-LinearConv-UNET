@@ -68,7 +68,7 @@ def compute_PReLU_memory(module, inp, out):
 def compute_ConvTranspose2d_memory(module, inp, out):
     """Compute memory usage of ConvTranspose2d."""
     # Can have multiple inputs, getting the first one
-    assert isinstance(module, nn.ConvTranspose2d, LinearTransposeConv2DSimple)
+    assert isinstance(module, (nn.ConvTranspose2d, LinearTransposeConv2DSimple))
     assert len(inp.size()) == 4
     assert len(out.size()) == 4
 
@@ -82,7 +82,7 @@ def compute_ConvTranspose2d_memory(module, inp, out):
 def compute_Conv2d_memory(module, inp, out):
     """Compute memory usage of Conv2d."""
     # Can have multiple inputs, getting the first one
-    assert isinstance(module, nn.Conv2d, LinearConv2DSimple)
+    assert isinstance(module, (nn.Conv2d, LinearConv2DSimple))
     assert len(inp.size()) == 4
     assert len(out.size()) == 4
 
