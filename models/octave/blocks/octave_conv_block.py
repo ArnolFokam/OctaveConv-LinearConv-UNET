@@ -96,38 +96,37 @@ class DoubleOctaveConvBlock(nn.Module):
                  bias=True, padding_mode='zeros', **kwargs):
         super(DoubleOctaveConvBlock, self).__init__()
 
-        if kwargs.get('variant') is None:
-            self.conv_block_1 = OctaveConvBlock(in_channels, mid_channels,
-                                                in_alpha, mid_alpha,
-                                                batch_norm=batch_norm,
-                                                dropout=dropout,
-                                                act_fn=act_fn,
-                                                spatial_ratio=spatial_ratio,
-                                                merge_mode=merge_mode,
-                                                kernel_size=kernel_size,
-                                                stride=stride,
-                                                padding=padding,
-                                                dilation=dilation,
-                                                groups=groups,
-                                                bias=bias,
-                                                padding_mode=padding_mode,
-                                                **kwargs)
+        self.conv_block_1 = OctaveConvBlock(in_channels, mid_channels,
+                                            in_alpha, mid_alpha,
+                                            batch_norm=batch_norm,
+                                            dropout=dropout,
+                                            act_fn=act_fn,
+                                            spatial_ratio=spatial_ratio,
+                                            merge_mode=merge_mode,
+                                            kernel_size=kernel_size,
+                                            stride=stride,
+                                            padding=padding,
+                                            dilation=dilation,
+                                            groups=groups,
+                                            bias=bias,
+                                            padding_mode=padding_mode,
+                                            **kwargs)
 
-            self.conv_block_2 = OctaveConvBlock(mid_channels, out_channels,
-                                                mid_alpha, out_alpha,
-                                                batch_norm=batch_norm,
-                                                dropout=dropout,
-                                                act_fn=act_fn,
-                                                spatial_ratio=spatial_ratio,
-                                                merge_mode=merge_mode,
-                                                kernel_size=kernel_size,
-                                                stride=stride,
-                                                padding=padding,
-                                                dilation=dilation,
-                                                groups=groups,
-                                                bias=bias,
-                                                padding_mode=padding_mode,
-                                                **kwargs)
+        self.conv_block_2 = OctaveConvBlock(mid_channels, out_channels,
+                                            mid_alpha, out_alpha,
+                                            batch_norm=batch_norm,
+                                            dropout=dropout,
+                                            act_fn=act_fn,
+                                            spatial_ratio=spatial_ratio,
+                                            merge_mode=merge_mode,
+                                            kernel_size=kernel_size,
+                                            stride=stride,
+                                            padding=padding,
+                                            dilation=dilation,
+                                            groups=groups,
+                                            bias=bias,
+                                            padding_mode=padding_mode,
+                                            **kwargs)
 
     # pylint: disable=arguments-differ
     def forward(self, input_h, input_l):
