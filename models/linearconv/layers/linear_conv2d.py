@@ -38,7 +38,6 @@ class _LinearConv2D(_ConvNd):
             padding_mode)
 
         self.times = ratio  # default ratio 1/2
-        print(out_channels // self.times)
 
         # we don't need pytorch generated
         # weights from _ConvNd since we

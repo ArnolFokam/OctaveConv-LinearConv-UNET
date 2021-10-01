@@ -41,7 +41,7 @@ class _LinearTransposeConv2D(_ConvTransposeNd):
             self.bias.data.uniform_(-0.1, 0.1)
 
         self.conv_weights = nn.Parameter(
-            torch.Tensor(out_channels // self.times, in_channels, self.kernel_size_int, self.kernel_size_int))
+            torch.Tensor(int(out_channels // self.times), in_channels, self.kernel_size_int, self.kernel_size_int))
 
         nn.init.xavier_uniform_(self.conv_weights)
 
@@ -81,15 +81,15 @@ class LinearTransposeConv2DSimple(_LinearTransposeConv2D):
             ratio)
 
         self.linear_weights = nn.Parameter(
-            torch.Tensor(out_channels - out_channels // self.times, out_channels // self.times))
+            torch.Tensor(out_channels - int(out_channels // self.times), int(out_channels // self.times)))
 
         nn.init.xavier_uniform_(self.conv_weights)
         self.linear_weights.data.uniform_(-0.1, 0.1)
 
     def forward(self, inputs, output_size=None):
         correlated_weights = torch.mm(self.linear_weights,
-                                      self.conv_weights.reshape(self.out_channels // self.times, -1)) \
-            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size_int,
+                                      self.conv_weights.reshape(int(self.out_channels // self.times), -1)) \
+            .reshape(self.out_channels - int(self.out_channels // self.times), self.in_channels, self.kernel_size_int,
                      self.kernel_size_int)
 
         return self._conv_forward(inputs,
@@ -132,8 +132,8 @@ class LinearTransposeConv2DLowRank(_LinearTransposeConv2D):
         # initialize our own weights
         del self.weight
 
-        self.column_weights = nn.Parameter(torch.Tensor(out_channels - out_channels // self.times, self.rank))
-        self.row_weights = nn.Parameter(torch.Tensor(self.rank, out_channels // self.times))
+        self.column_weights = nn.Parameter(torch.Tensor(out_channels - int(out_channels // self.times), self.rank))
+        self.row_weights = nn.Parameter(torch.Tensor(self.rank, int(out_channels // self.times)))
 
         nn.init.xavier_uniform_(self.conv_weights)
         self.column_weights.data.uniform_(-0.1, 0.1)
@@ -141,8 +141,8 @@ class LinearTransposeConv2DLowRank(_LinearTransposeConv2D):
 
     def forward(self, inputs, output_size=None):
         correlated_weights = torch.mm(self.column_weights, torch.mm(self.row_weights, self.conv_weights.reshape(
-            self.out_channels // self.times, -1))) \
-            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size_int,
+            int(self.out_channels // self.times), -1))) \
+            .reshape(self.out_channels - int(self.out_channels // self.times), self.in_channels, self.kernel_size_int,
                      self.kernel_size_int)
 
         return self._conv_forward(inputs,
@@ -186,9 +186,9 @@ class LinearTransposeConv2DRankRatio(_LinearTransposeConv2D):
         del self.weight
 
         self.column_weights = nn.Parameter(
-            torch.Tensor(out_channels - out_channels // self.times, int((out_channels // self.times) * self.rank)))
+            torch.Tensor(out_channels - int(out_channels // self.times), int((out_channels // self.times) * self.rank)))
         self.row_weights = nn.Parameter(
-            torch.Tensor(int((out_channels // self.times) * self.rank), out_channels // self.times))
+            torch.Tensor(int((out_channels // self.times) * self.rank), int(out_channels // self.times)))
 
         nn.init.xavier_uniform_(self.conv_weights)
         self.column_weights.data.uniform_(-0.1, 0.1)
@@ -196,8 +196,8 @@ class LinearTransposeConv2DRankRatio(_LinearTransposeConv2D):
 
     def forward(self, inputs, output_size=None):
         correlated_weights = torch.mm(self.column_weights, torch.mm(self.row_weights, self.conv_weights.reshape(
-            self.out_channels // self.times, -1))) \
-            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size_int,
+            int(self.out_channels // self.times), -1))) \
+            .reshape(self.out_channels - int(self.out_channels // self.times), self.in_channels, self.kernel_size_int,
                      self.kernel_size_int)
 
         return self._conv_forward(inputs,
@@ -243,7 +243,7 @@ class LinearTransposeConv2DSparse(_LinearTransposeConv2D):
         self.threshold = 0
 
         self.linear_weights = nn.Parameter(
-            torch.Tensor(out_channels - out_channels // self.times, out_channels // self.times))
+            torch.Tensor(out_channels - int(out_channels // self.times), int(out_channels // self.times)))
 
         self.linear_weights.data.uniform_(-0.1, 0.1)
 
@@ -262,8 +262,8 @@ class LinearTransposeConv2DSparse(_LinearTransposeConv2D):
 
         self.mask = nn.Parameter(self.mask.type(torch.FloatTensor).to(self.device), requires_grad=False)
         temp = self.linear_weights * self.mask
-        correlated_weights = torch.mm(temp, self.conv_weights.reshape(self.out_channels // self.times, -1)) \
-            .reshape(self.out_channels - self.out_channels // self.times, self.in_channels, self.kernel_size_int,
+        correlated_weights = torch.mm(temp, self.conv_weights.reshape(int(self.out_channels // self.times), -1)) \
+            .reshape(self.out_channels - int(self.out_channels // self.times), self.in_channels, self.kernel_size_int,
                      self.kernel_size_int)
 
         return self._conv_forward(inputs,
